@@ -1,12 +1,14 @@
 from fastapi import Depends, FastAPI, HTTPException
 from app.controllers.material_controller import MaterialRouter
 from app.database.database import get_db
+from app.infra.errors import registrar_handlers
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 app = FastAPI(title="Sistema de Avaliação PRF")
+registrar_handlers(app)
 
 
 @app.get("/health", tags=["Health"])
