@@ -1,5 +1,4 @@
 from fastapi import Depends, FastAPI, HTTPException
-from app.controllers.material_controller import MaterialRouter
 from app.controllers.medicamento_controller import MedicamentoRouter
 from app.controllers.opcao_nesc_controller import OpcaoNescRouter
 from app.database.database import get_db
@@ -22,7 +21,6 @@ def health(db: Session = Depends(get_db)):
     return {"status": "ok"}
 
 
-app.include_router(MaterialRouter)
 app.include_router(MedicamentoRouter)
 app.include_router(OpcaoNescRouter)
 app.add_middleware(
