@@ -37,7 +37,7 @@ services:
   # backend:
   #   build: ./backend
   #   environment:
-  #     DATABASE_URL: postgresql+psycopg://prf:prf123@postgres:5432/avaliacao_prf
+  #     DATABASE_URL: postgresql://prf:prf123@postgres:5432/avaliacao_prf
   #   ports:
   #     - "8000:8000"
   #   depends_on:
