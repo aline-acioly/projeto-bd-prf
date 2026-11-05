@@ -5,14 +5,13 @@ Projeto da disciplina de Banco de Dados (CIn/UFPE): sistema de acompanhamento em
 ## Stack
 
 - **Backend:** Python, FastAPI, SQLAlchemy 2 e Pydantic
-- **Frontend:** React, Vite, TypeScript, Tailwind CSS e shadcn/ui
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS e React Router, organizado em Atomic Design
 - **Banco de dados:** PostgreSQL 16
 
 ## Estrutura de pastas
 
 ```
 projeto-bd-prf/
-├── .github/workflows/       # CI do backend
 ├── backend/
 │   ├── app/
 │   │   ├── controllers/     # Rotas da API
@@ -27,12 +26,12 @@ projeto-bd-prf/
 └── frontend/
     ├── public/
     └── src/
-        ├── components/      # Componentes React e shadcn/ui
-        ├── hooks/
-        ├── lib/             # Utilitários
-        ├── pages/           # Páginas
-        ├── services/        # Chamadas à API
-        └── types/           # Tipos TypeScript
+        ├── components/
+        │   ├── atoms/       # Peças indivisíveis
+        │   ├── molecules/   # Combinações simples de atoms
+        │   ├── organisms/   # Blocos completos, como o menu lateral
+        │   └── templates/   # Estrutura das páginas
+        └── pages/           # Telas ligadas às rotas
 ```
 
 ## Como rodar

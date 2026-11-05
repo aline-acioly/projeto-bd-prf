@@ -18,7 +18,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+backend/lib/
 lib64/
 parts/
 sdist/
@@ -177,9 +177,6 @@ pyrightconfig.json
 
 
 CLAUDE.md
-
-# Exceção à regra lib/ do template Python
-!frontend/src/lib/
 
 # Frontend e sistema
 node_modules/

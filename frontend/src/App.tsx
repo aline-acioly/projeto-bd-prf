@@ -1,27 +1,22 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { EmConstrucaoPage, NotFound } from "./pages";
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Navigate to="/pacientes" replace />} />
+      <Route path="/pacientes" element={<EmConstrucaoPage titulo="Pacientes" />} />
+      <Route path="/profissionais" element={<EmConstrucaoPage titulo="Profissionais" />} />
+      <Route path="/estagiarios" element={<EmConstrucaoPage titulo="Estagiários" />} />
+      <Route path="/medicamentos" element={<EmConstrucaoPage titulo="Medicamentos" />} />
+      <Route path="/consultas" element={<EmConstrucaoPage titulo="Consultas" />} />
+      <Route path="/avaliacoes" element={<EmConstrucaoPage titulo="Avaliações" />} />
+      <Route path="/opcoes-nesc" element={<EmConstrucaoPage titulo="Opções NESC" />} />
+      <Route path="/suspeitas" element={<EmConstrucaoPage titulo="Suspeitas" />} />
+      <Route path="/intervencoes" element={<EmConstrucaoPage titulo="Intervenções" />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </BrowserRouter>
 );
 
 export default App;
