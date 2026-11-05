@@ -1,0 +1,48 @@
+# Sistema de Avaliação PRF — ambiente de banco (Etapa 3)
+# Subir:   docker compose up -d
+# pgAdmin: http://localhost:16543  (login abaixo)
+# Conexão no pgAdmin: host = postgres | porta = 5432 | user/senha = os do serviço postgres
+# Recriar o banco do zero (re-executa db/init/*.sql): docker compose down -v && docker compose up -d
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: prf-postgres
+    environment:
+      POSTGRES_USER: prf
+      POSTGRES_PASSWORD: prf123
+      POSTGRES_DB: avaliacao_prf
+    ports:
+      - "15432:5432"          # do seu PC: localhost:15432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro   # schema, triggers e seed rodam na 1ª subida
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prf -d avaliacao_prf"]
+      interval: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:8.12
+    container_name: prf-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@prf.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres
+
+  # Etapa 3: descomente quando o backend existir (pasta ./backend com Dockerfile)
+  # backend:
+  #   build: ./backend
+  #   environment:
+  #     DATABASE_URL: postgresql+psycopg://prf:prf123@postgres:5432/avaliacao_prf
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+volumes:
+  pgdata:
