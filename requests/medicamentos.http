@@ -1,0 +1,58 @@
+# Medicamentos (catálogo). O status esperado está no título de cada requisição.
+# Rode "Criar" antes de "Atualizar" e "Apagar", que usam o id criado.
+# Todo POST avança a sequence do id, mesmo quando falha com 409.
+
+@baseUrl = http://localhost:8000
+
+### Listar (200)
+GET {{baseUrl}}/medicamentos
+
+### Listar com paginação e filtro parcial por nome (200)
+GET {{baseUrl}}/medicamentos?nome=lo&skip=0&limit=5
+
+### Buscar por id (200)
+GET {{baseUrl}}/medicamentos/1
+
+### Criar (201)
+# @name criarMedicamento
+POST {{baseUrl}}/medicamentos
+Content-Type: application/json
+
+{
+  "nome": "Dipirona",
+  "forma_farmaceutica": "comprimido"
+}
+
+### Atualizar só os campos enviados (200)
+PATCH {{baseUrl}}/medicamentos/{{criarMedicamento.response.body.id_medicamento}}
+Content-Type: application/json
+
+{
+  "forma_farmaceutica": "solução"
+}
+
+### Apagar (204)
+DELETE {{baseUrl}}/medicamentos/{{criarMedicamento.response.body.id_medicamento}}
+
+### Erro: id inexistente (404)
+GET {{baseUrl}}/medicamentos/999999
+
+### Erro: medicamento duplicado, mesmo nome e forma (409)
+POST {{baseUrl}}/medicamentos
+Content-Type: application/json
+
+{
+  "nome": "Losartana",
+  "forma_farmaceutica": "comprimido"
+}
+
+### Erro: apagar medicamento em uso (409)
+DELETE {{baseUrl}}/medicamentos/1
+
+### Erro: campo obrigatório ausente (422)
+POST {{baseUrl}}/medicamentos
+Content-Type: application/json
+
+{
+  "nome": "Sem forma"
+}

@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Annotated
 
+from fastapi import Path, Query
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 
 
@@ -14,7 +15,20 @@ def _nao_futura(valor: date) -> date:
 Cpf = Annotated[str, Field(pattern=r"^[0-9]{11}$")]
 # Limite do INT do Postgres: acima dele o banco dá erro de faixa, não de FK.
 Id = Annotated[int, Field(ge=1, le=2147483647)]
+IdRota = Annotated[int, Path(ge=1, le=2147483647)]
 DataNascimento = Annotated[date, AfterValidator(_nao_futura)]
+
+
+class Paginacao:
+    """Parâmetros de lista. Use na rota com `paginacao: Paginacao = Depends()`."""
+
+    def __init__(
+        self,
+        skip: int = Query(0, ge=0, le=1_000_000),
+        limit: int = Query(50, ge=1, le=200),
+    ):
+        self.skip = skip
+        self.limit = limit
 
 
 class EntradaBase(BaseModel):

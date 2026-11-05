@@ -1,0 +1,55 @@
+# Opções NESC (catálogo). O status esperado está no título de cada requisição.
+# Rode "Criar" antes de "Atualizar" e "Apagar", que usam o id criado.
+# Todo POST avança a sequence do id.
+
+@baseUrl = http://localhost:8000
+
+### Listar (200)
+GET {{baseUrl}}/opcoes-nesc
+
+### Listar com paginação e filtro por categoria (200)
+GET {{baseUrl}}/opcoes-nesc?categoria=Efetividade&skip=0&limit=5
+
+### Buscar por id (200)
+GET {{baseUrl}}/opcoes-nesc/1
+
+### Criar (201)
+# @name criarOpcaoNesc
+POST {{baseUrl}}/opcoes-nesc
+Content-Type: application/json
+
+{
+  "categoria": "Segurança",
+  "subtipo": "outro",
+  "descricao": "Interação medicamentosa"
+}
+
+### Atualizar só os campos enviados (200)
+PATCH {{baseUrl}}/opcoes-nesc/{{criarOpcaoNesc.response.body.id_opcao_nesc}}
+Content-Type: application/json
+
+{
+  "subtipo": "qualitativo"
+}
+
+### Apagar (204)
+DELETE {{baseUrl}}/opcoes-nesc/{{criarOpcaoNesc.response.body.id_opcao_nesc}}
+
+### Erro: id inexistente (404)
+GET {{baseUrl}}/opcoes-nesc/999999
+
+### Erro: categoria inválida ao criar (422)
+POST {{baseUrl}}/opcoes-nesc
+Content-Type: application/json
+
+{
+  "categoria": "Outra",
+  "subtipo": "outro",
+  "descricao": "Categoria fora do CHECK"
+}
+
+### Erro: categoria inválida no filtro (422)
+GET {{baseUrl}}/opcoes-nesc?categoria=Outra
+
+### Erro: apagar opção usada por suspeitas (409)
+DELETE {{baseUrl}}/opcoes-nesc/1

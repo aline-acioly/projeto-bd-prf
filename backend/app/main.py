@@ -1,5 +1,7 @@
 from fastapi import Depends, FastAPI, HTTPException
 from app.controllers.material_controller import MaterialRouter
+from app.controllers.medicamento_controller import MedicamentoRouter
+from app.controllers.opcao_nesc_controller import OpcaoNescRouter
 from app.database.database import get_db
 from app.infra.errors import registrar_handlers
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,6 +23,8 @@ def health(db: Session = Depends(get_db)):
 
 
 app.include_router(MaterialRouter)
+app.include_router(MedicamentoRouter)
+app.include_router(OpcaoNescRouter)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:8080"],
