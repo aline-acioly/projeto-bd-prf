@@ -1,12 +1,20 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from app.controllers.material_controller import MaterialRouter
+from app.database.database import get_db
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 app = FastAPI(title="Sistema de Avaliação PRF")
 
 
 @app.get("/health", tags=["Health"])
-def health():
+def health(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+    except SQLAlchemyError:
+        raise HTTPException(status_code=503, detail="Banco de dados indisponível")
     return {"status": "ok"}
 
 
