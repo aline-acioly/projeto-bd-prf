@@ -1,0 +1,89 @@
+# Estagiários (PESSOA + ESTAGIARIO). O status esperado está no título de cada requisição.
+# Rode "Criar" antes de "Atualizar" e "Apagar", que usam o CPF criado.
+# Rode "Apagar" no fim para o banco voltar ao seed.
+
+@baseUrl = http://localhost:8000
+@cpf = 40000000004
+
+### Listar (200)
+GET {{baseUrl}}/estagiarios
+
+### Listar com paginação e filtro parcial por nome (200)
+GET {{baseUrl}}/estagiarios?nome=santos&skip=0&limit=5
+
+### Buscar por CPF (200)
+GET {{baseUrl}}/estagiarios/30000000001
+
+### Criar: grava PESSOA e ESTAGIARIO na mesma transação (201)
+POST {{baseUrl}}/estagiarios
+Content-Type: application/json
+
+{
+  "cpf": "{{cpf}}",
+  "nome": "Marina Costa",
+  "data_nasc": "2004-03-09",
+  "sexo": "F",
+  "telefone": "81990000023",
+  "instituicao_ensino": "UFPE",
+  "curso": "Farmácia"
+}
+
+### Atualizar campos de PESSOA e da subclasse na mesma chamada (200)
+PATCH {{baseUrl}}/estagiarios/{{cpf}}
+Content-Type: application/json
+
+{
+  "nome": "Marina Costa Lima",
+  "instituicao_ensino": "UFRPE"
+}
+
+### Apagar (204)
+DELETE {{baseUrl}}/estagiarios/{{cpf}}
+
+### Erro: CPF que não é estagiário (404)
+GET {{baseUrl}}/estagiarios/20000000001
+
+### Erro: CPF repetido (409)
+POST {{baseUrl}}/estagiarios
+Content-Type: application/json
+
+{
+  "cpf": "30000000001",
+  "nome": "Lucas Andrade",
+  "data_nasc": "2002-02-17",
+  "sexo": "M",
+  "telefone": "81990000021",
+  "instituicao_ensino": "UFPE",
+  "curso": "Farmácia"
+}
+
+### Erro: CPF inválido, precisa ter 11 dígitos (422)
+POST {{baseUrl}}/estagiarios
+Content-Type: application/json
+
+{
+  "cpf": "3000000000A",
+  "nome": "CPF Inválido",
+  "data_nasc": "2003-01-01",
+  "sexo": "M",
+  "telefone": "81990000099",
+  "instituicao_ensino": "UFPE",
+  "curso": "Farmácia"
+}
+
+### Erro: CPF com dois papéis, já é profissional — trigger R1 (400)
+POST {{baseUrl}}/estagiarios
+Content-Type: application/json
+
+{
+  "cpf": "20000000001",
+  "nome": "Dra. Paula Menezes",
+  "data_nasc": "1985-05-10",
+  "sexo": "F",
+  "telefone": "81990000011",
+  "instituicao_ensino": "UFPE",
+  "curso": "Farmácia"
+}
+
+### Erro: apagar estagiário que atendeu consultas (409)
+DELETE {{baseUrl}}/estagiarios/30000000001

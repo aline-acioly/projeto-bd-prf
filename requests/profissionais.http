@@ -1,0 +1,96 @@
+# Profissionais de saúde (PESSOA + PROFISSIONAL_SAUDE). O status esperado está no título.
+# Rode "Criar" antes de "Atualizar" e "Apagar", que usam o CPF criado.
+# Rode "Apagar" no fim para o banco voltar ao seed.
+
+@baseUrl = http://localhost:8000
+@cpf = 40000000002
+
+### Listar (200)
+GET {{baseUrl}}/profissionais
+
+### Listar com paginação e filtro parcial por nome (200)
+GET {{baseUrl}}/profissionais?nome=paula&skip=0&limit=5
+
+### Buscar por CPF (200)
+GET {{baseUrl}}/profissionais/20000000001
+
+### Criar: grava PESSOA e PROFISSIONAL_SAUDE na mesma transação (201)
+POST {{baseUrl}}/profissionais
+Content-Type: application/json
+
+{
+  "cpf": "{{cpf}}",
+  "nome": "Dra. Clara Moura",
+  "data_nasc": "1988-06-30",
+  "sexo": "F",
+  "telefone": "81990000013",
+  "conselho": "CRF",
+  "numero_registro": "24680",
+  "especialidade": "Farmácia clínica"
+}
+
+### Atualizar campos de PESSOA e da subclasse na mesma chamada (200)
+PATCH {{baseUrl}}/profissionais/{{cpf}}
+Content-Type: application/json
+
+{
+  "telefone": "81990000014",
+  "especialidade": "Geriatria"
+}
+
+### Apagar (204)
+DELETE {{baseUrl}}/profissionais/{{cpf}}
+
+### Erro: CPF que não é profissional (404)
+GET {{baseUrl}}/profissionais/10000000001
+
+### Erro: CPF repetido (409)
+POST {{baseUrl}}/profissionais
+Content-Type: application/json
+
+{
+  "cpf": "20000000001",
+  "nome": "Dra. Paula Menezes",
+  "data_nasc": "1985-05-10",
+  "sexo": "F",
+  "telefone": "81990000011",
+  "conselho": "CRF",
+  "numero_registro": "99999",
+  "especialidade": "Farmácia clínica"
+}
+
+### Erro: conselho e número de registro repetidos (409)
+POST {{baseUrl}}/profissionais
+Content-Type: application/json
+
+{
+  "cpf": "40000000003",
+  "nome": "Registro Repetido",
+  "data_nasc": "1980-01-01",
+  "sexo": "M",
+  "telefone": "81990000015",
+  "conselho": "CRF",
+  "numero_registro": "12345",
+  "especialidade": "Geriatria"
+}
+
+### Erro: CPF inválido, precisa ter 11 dígitos (422)
+GET {{baseUrl}}/profissionais/2000000000
+
+### Erro: CPF com dois papéis, já é paciente — trigger R1 (400)
+POST {{baseUrl}}/profissionais
+Content-Type: application/json
+
+{
+  "cpf": "10000000001",
+  "nome": "Ana Beatriz Lima",
+  "data_nasc": "1958-03-14",
+  "sexo": "F",
+  "telefone": "81990000001",
+  "conselho": "CRF",
+  "numero_registro": "13579",
+  "especialidade": "Farmácia clínica"
+}
+
+### Erro: apagar profissional que atendeu consultas (409)
+DELETE {{baseUrl}}/profissionais/20000000001

@@ -1,0 +1,89 @@
+# Pacientes (PESSOA + PACIENTE). O status esperado está no título de cada requisição.
+# Rode "Criar" antes de "Atualizar", "CPF repetido" e "Apagar", que usam o CPF criado.
+# Rode "Apagar" no fim para o banco voltar ao seed.
+
+@baseUrl = http://localhost:8000
+@cpf = 40000000001
+
+### Listar (200)
+GET {{baseUrl}}/pacientes
+
+### Listar com paginação e filtro parcial por nome (200)
+GET {{baseUrl}}/pacientes?nome=lima&skip=0&limit=5
+
+### Buscar por CPF (200)
+GET {{baseUrl}}/pacientes/10000000001
+
+### Criar: grava PESSOA e PACIENTE na mesma transação (201)
+POST {{baseUrl}}/pacientes
+Content-Type: application/json
+
+{
+  "cpf": "{{cpf}}",
+  "nome": "Joana Pereira",
+  "data_nasc": "1955-04-12",
+  "sexo": "F",
+  "telefone": "81990000031"
+}
+
+### Atualizar só os campos enviados; o CPF não muda (200)
+PATCH {{baseUrl}}/pacientes/{{cpf}}
+Content-Type: application/json
+
+{
+  "nome": "Joana Pereira da Silva",
+  "telefone": "81990000032"
+}
+
+### Apagar: a cascata leva PACIENTE, contatos e usos de medicamento (204)
+DELETE {{baseUrl}}/pacientes/{{cpf}}
+
+### Erro: CPF que não é paciente (404)
+GET {{baseUrl}}/pacientes/20000000001
+
+### Erro: CPF repetido (409)
+POST {{baseUrl}}/pacientes
+Content-Type: application/json
+
+{
+  "cpf": "10000000001",
+  "nome": "Ana Beatriz Lima",
+  "data_nasc": "1958-03-14",
+  "sexo": "F",
+  "telefone": "81990000001"
+}
+
+### Erro: CPF inválido, precisa ter 11 dígitos sem pontuação (422)
+POST {{baseUrl}}/pacientes
+Content-Type: application/json
+
+{
+  "cpf": "123.456.789-00",
+  "nome": "CPF Inválido",
+  "data_nasc": "1990-01-01",
+  "sexo": "M",
+  "telefone": "81990000099"
+}
+
+### Erro: CPF com dois papéis, já é estagiário — trigger R1 (400)
+POST {{baseUrl}}/pacientes
+Content-Type: application/json
+
+{
+  "cpf": "30000000001",
+  "nome": "Lucas Andrade",
+  "data_nasc": "2002-02-17",
+  "sexo": "M",
+  "telefone": "81990000021"
+}
+
+### Erro: alterar o CPF não é permitido (422)
+PATCH {{baseUrl}}/pacientes/10000000001
+Content-Type: application/json
+
+{
+  "cpf": "10000000009"
+}
+
+### Erro: apagar paciente com consultas (409)
+DELETE {{baseUrl}}/pacientes/10000000001

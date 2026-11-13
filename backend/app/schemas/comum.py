@@ -16,6 +16,7 @@ Cpf = Annotated[str, Field(pattern=r"^[0-9]{11}$")]
 # Limite do INT do Postgres: acima dele o banco dá erro de faixa, não de FK.
 Id = Annotated[int, Field(ge=1, le=2147483647)]
 IdRota = Annotated[int, Path(ge=1, le=2147483647)]
+CpfRota = Annotated[str, Path(pattern=r"^[0-9]{11}$")]
 DataNascimento = Annotated[date, AfterValidator(_nao_futura)]
 
 
