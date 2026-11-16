@@ -22,4 +22,5 @@ export function formatarTelefone(telefone: string | null | undefined): string {
 
 export const formatarSexo = (sexo: string) => (sexo === "F" ? "Feminino" : sexo === "M" ? "Masculino" : sexo);
 
+/** Primeira letra maiúscula, para exibir texto livre ("comprimido" → "Comprimido"). O resto fica como está. */
 export const capitalizar = (texto: string) => texto.charAt(0).toUpperCase() + texto.slice(1);

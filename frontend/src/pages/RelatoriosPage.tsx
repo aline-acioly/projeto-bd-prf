@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { BadgeCategoriaNesc, BadgeTipoConsulta, Select, type OpcaoSelect } from "@/components/atoms";
+import { Badge, BadgeCategoriaNesc, Select, type OpcaoSelect } from "@/components/atoms";
 import { PageHeader } from "@/components/molecules";
 import { RelatorioSection, type ColunaTabela } from "@/components/organisms";
 import { MainLayout } from "@/components/templates";
@@ -22,7 +22,8 @@ const ou = (valor: string | number | null) => (valor === null ? "—" : valor);
 const COLUNAS_HISTORICO: ColunaTabela<HistoricoPacienteLinha>[] = [
   { titulo: "Consulta", valor: (l) => `#${l.id_consulta}`, mono: true },
   { titulo: "Data", valor: (l) => formatarData(l.data_agendada) },
-  { titulo: "Tipo", valor: (l) => <BadgeTipoConsulta tipo={l.tipo} /> },
+  // Relatórios mostram os valores como o SQL devolve, sem os rótulos de exibição.
+  { titulo: "Tipo", valor: (l) => <Badge variante={l.tipo === "retorno" ? "contorno" : "neutro"}>{l.tipo}</Badge> },
   { titulo: "Atendente", valor: (l) => l.atendente },
   { titulo: "Avaliação", valor: (l) => (l.id_avaliacao === null ? "ainda não avaliada" : `#${l.id_avaliacao} · ${formatarData(l.data_realizacao)}`) },
   { titulo: "Medicamento suspeito", valor: (l) => ou(l.medicamento) },

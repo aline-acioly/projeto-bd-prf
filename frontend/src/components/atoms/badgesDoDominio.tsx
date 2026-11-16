@@ -1,9 +1,10 @@
 // Atalhos de Badge para os valores do domínio (padrão do GFD: um wrapper por variante).
 import type { CategoriaNesc, PapelAtendente, TipoConsulta } from "@/types";
+import { ROTULOS_TIPO_CONSULTA } from "@/utils/rotulos";
 import { Badge } from "./Badge";
 
 export function BadgeTipoConsulta({ tipo }: { tipo: TipoConsulta }) {
-  return tipo === "retorno" ? <Badge variante="contorno">Retorno</Badge> : <Badge>Inicial</Badge>;
+  return <Badge variante={tipo === "retorno" ? "contorno" : "neutro"}>{ROTULOS_TIPO_CONSULTA[tipo]}</Badge>;
 }
 
 /** Realizada: a consulta já tem avaliação. Agendada: ainda não. */

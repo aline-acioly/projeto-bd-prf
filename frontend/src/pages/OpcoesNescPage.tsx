@@ -3,18 +3,18 @@ import { CrudSection, type CampoFormulario, type ColunaTabela } from "@/componen
 import { MainLayout } from "@/components/templates";
 import { opcoesNescApi } from "@/services";
 import { CATEGORIAS_NESC, SUBTIPOS_NESC, type OpcaoNesc, type OpcaoNescEntrada } from "@/types";
-import { paraOpcoes } from "@/utils";
+import { ROTULOS_SUBTIPO_NESC, opcoesComRotulo, paraOpcoes } from "@/utils";
 
 const CAMPOS: CampoFormulario[] = [
   { nome: "categoria", rotulo: "Categoria", tipo: "select", obrigatorio: true, opcoes: paraOpcoes(CATEGORIAS_NESC) },
-  { nome: "subtipo", rotulo: "Subtipo", tipo: "select", obrigatorio: true, opcoes: paraOpcoes(SUBTIPOS_NESC) },
+  { nome: "subtipo", rotulo: "Subtipo", tipo: "select", obrigatorio: true, opcoes: opcoesComRotulo(SUBTIPOS_NESC, ROTULOS_SUBTIPO_NESC) },
   { nome: "descricao", rotulo: "Descrição", tipo: "text", obrigatorio: true },
 ];
 
 const COLUNAS: ColunaTabela<OpcaoNesc>[] = [
   { titulo: "ID", valor: (o) => o.id_opcao_nesc, mono: true },
   { titulo: "Categoria", valor: (o) => <BadgeCategoriaNesc categoria={o.categoria} /> },
-  { titulo: "Subtipo", valor: (o) => o.subtipo },
+  { titulo: "Subtipo", valor: (o) => ROTULOS_SUBTIPO_NESC[o.subtipo] },
   { titulo: "Descrição", valor: (o) => o.descricao },
 ];
 

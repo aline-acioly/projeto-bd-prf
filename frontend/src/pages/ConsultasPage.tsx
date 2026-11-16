@@ -4,11 +4,20 @@ import { CrudSection, type CampoFormulario, type ColunaTabela } from "@/componen
 import { MainLayout } from "@/components/templates";
 import { consultasApi } from "@/services";
 import { TIPOS_CONSULTA, type Consulta, type ConsultaEntrada, type ParametrosLista, type TipoConsulta } from "@/types";
-import { formatarData, opcoesAtendentes, opcoesAvaliacoes, opcoesPacientes, paraOpcoes } from "@/utils";
+import {
+  ROTULOS_TIPO_CONSULTA,
+  formatarData,
+  opcoesAtendentes,
+  opcoesAvaliacoes,
+  opcoesComRotulo,
+  opcoesPacientes,
+} from "@/utils";
+
+const OPCOES_TIPO = opcoesComRotulo(TIPOS_CONSULTA, ROTULOS_TIPO_CONSULTA);
 
 const CAMPOS: CampoFormulario[] = [
   { nome: "data_agendada", rotulo: "Data agendada", tipo: "date", obrigatorio: true },
-  { nome: "tipo", rotulo: "Tipo", tipo: "select", obrigatorio: true, opcoes: paraOpcoes(TIPOS_CONSULTA) },
+  { nome: "tipo", rotulo: "Tipo", tipo: "select", obrigatorio: true, opcoes: OPCOES_TIPO },
   { nome: "cpf_paciente", rotulo: "Paciente", tipo: "select", obrigatorio: true, carregarOpcoes: opcoesPacientes },
   {
     nome: "cpf_atendente",
@@ -89,7 +98,7 @@ export function ConsultasPage() {
           <div className="w-44">
             <Select
               aria-label="Filtrar por tipo"
-              opcoes={paraOpcoes(TIPOS_CONSULTA)}
+              opcoes={OPCOES_TIPO}
               placeholder="Todos os tipos"
               value={tipo}
               onChange={(evento) => setTipo(evento.target.value as TipoConsulta | "")}

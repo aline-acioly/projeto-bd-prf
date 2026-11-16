@@ -13,7 +13,7 @@ import type {
   UsoMedicamento,
   UsoMedicamentoEntrada,
 } from "@/types";
-import { formatarCpf, formatarData, formatarSexo, formatarTelefone, opcoesMedicamentos } from "@/utils";
+import { capitalizar, formatarCpf, formatarData, formatarSexo, formatarTelefone, opcoesMedicamentos } from "@/utils";
 
 const CAMPOS_CONTATO: CampoFormulario[] = [
   // O nome é parte da chave (entidade fraca): não muda na edição.
@@ -25,7 +25,7 @@ const CAMPOS_CONTATO: CampoFormulario[] = [
 const COLUNAS_CONTATO: ColunaTabela<ContatoEmergencia>[] = [
   { titulo: "Nome", valor: (c) => c.nome },
   { titulo: "Telefone", valor: (c) => formatarTelefone(c.telefone), mono: true },
-  { titulo: "Relação", valor: (c) => c.relacao },
+  { titulo: "Relação", valor: (c) => capitalizar(c.relacao) },
 ];
 
 const CAMPOS_USO: CampoFormulario[] = [
@@ -44,10 +44,10 @@ const CAMPOS_USO: CampoFormulario[] = [
 ];
 
 const COLUNAS_USO: ColunaTabela<UsoMedicamento>[] = [
-  { titulo: "Medicamento", valor: (u) => `${u.medicamento.nome} (${u.medicamento.forma_farmaceutica})` },
+  { titulo: "Medicamento", valor: (u) => `${u.medicamento.nome} (${capitalizar(u.medicamento.forma_farmaceutica)})` },
   { titulo: "Dose", valor: (u) => u.dose },
-  { titulo: "Via", valor: (u) => u.via_administracao },
-  { titulo: "Frequência", valor: (u) => u.frequencia_uso },
+  { titulo: "Via", valor: (u) => capitalizar(u.via_administracao) },
+  { titulo: "Frequência", valor: (u) => capitalizar(u.frequencia_uso) },
 ];
 
 export function PacienteDetalhePage() {

@@ -3,7 +3,7 @@ import { CrudSection, type CampoFormulario, type ColunaTabela, type TextosFormul
 import { MainLayout } from "@/components/templates";
 import { avaliacoesApi, suspeitasApi } from "@/services";
 import type { Suspeita, SuspeitaEntrada } from "@/types";
-import { formatarCpf, formatarData, opcoesAvaliacoes, opcoesNesc, opcoesUsosDoPaciente } from "@/utils";
+import { ROTULOS_SUBTIPO_NESC, capitalizar, formatarCpf, formatarData, opcoesAvaliacoes, opcoesNesc, opcoesUsosDoPaciente } from "@/utils";
 
 /** O paciente da suspeita é o da consulta avaliada (trigger R4). */
 async function pacienteDaAvaliacao(idAvaliacao: number | string): Promise<string> {
@@ -43,14 +43,14 @@ const COLUNAS: ColunaTabela<Suspeita>[] = [
   { titulo: "Registro", valor: (s) => formatarData(s.data_registro) },
   { titulo: "Avaliação", valor: (s) => `#${s.id_avaliacao}`, mono: true },
   { titulo: "Paciente (CPF)", valor: (s) => formatarCpf(s.cpf_paciente), mono: true },
-  { titulo: "Medicamento", valor: (s) => `${s.medicamento.nome} (${s.medicamento.forma_farmaceutica})` },
+  { titulo: "Medicamento", valor: (s) => `${s.medicamento.nome} (${capitalizar(s.medicamento.forma_farmaceutica)})` },
   {
     titulo: "Problema (NESC)",
     valor: (s) => (
       <span className="inline-flex flex-wrap items-center gap-2">
         <BadgeCategoriaNesc categoria={s.opcao_nesc.categoria} />
         <span>
-          {s.opcao_nesc.subtipo}: {s.opcao_nesc.descricao}
+          {ROTULOS_SUBTIPO_NESC[s.opcao_nesc.subtipo]}: {s.opcao_nesc.descricao}
         </span>
       </span>
     ),

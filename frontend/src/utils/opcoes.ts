@@ -12,7 +12,8 @@ import {
   suspeitasApi,
   usoMedicamentosApi,
 } from "@/services";
-import { formatarCpf, formatarData } from "./formatar";
+import { capitalizar, formatarCpf, formatarData } from "./formatar";
+import { ROTULOS_SUBTIPO_NESC, ROTULOS_TIPO_CONSULTA } from "./rotulos";
 
 const TODOS = { limit: 200 };
 
@@ -46,7 +47,7 @@ export async function opcoesMedicamentos(): Promise<OpcaoSelect[]> {
   const medicamentos = await medicamentosApi.listar(TODOS);
   return medicamentos.map((m) => ({
     valor: String(m.id_medicamento),
-    rotulo: `${m.nome} (${m.forma_farmaceutica})`,
+    rotulo: `${m.nome} (${capitalizar(m.forma_farmaceutica)})`,
   }));
 }
 
@@ -54,7 +55,7 @@ export async function opcoesNesc(): Promise<OpcaoSelect[]> {
   const opcoes = await opcoesNescApi.listar(TODOS);
   return opcoes.map((o) => ({
     valor: String(o.id_opcao_nesc),
-    rotulo: `${o.categoria} / ${o.subtipo} — ${o.descricao}`,
+    rotulo: `${o.categoria} / ${ROTULOS_SUBTIPO_NESC[o.subtipo]} — ${o.descricao}`,
   }));
 }
 
@@ -65,7 +66,7 @@ export async function opcoesConsultas(): Promise<OpcaoSelect[]> {
   return consultas.map((c) => ({
     valor: String(c.id_consulta),
     rotulo:
-      `#${c.id_consulta} · ${formatarData(c.data_agendada)} · ${c.paciente.nome} · ${c.tipo} · ` +
+      `#${c.id_consulta} · ${formatarData(c.data_agendada)} · ${c.paciente.nome} · ${ROTULOS_TIPO_CONSULTA[c.tipo]} · ` +
       `${c.atendente.nome}${avaliadas.has(c.id_consulta) ? " (já avaliada)" : ""}`,
   }));
 }
@@ -83,7 +84,7 @@ export async function opcoesUsosDoPaciente(cpf: string): Promise<OpcaoSelect[]> 
   const usos = await usoMedicamentosApi.listar(cpf, TODOS);
   return usos.map((u) => ({
     valor: String(u.id_medicamento),
-    rotulo: `${u.medicamento.nome} (${u.medicamento.forma_farmaceutica}) — ${u.dose}, ${u.frequencia_uso}`,
+    rotulo: `${u.medicamento.nome} (${capitalizar(u.medicamento.forma_farmaceutica)}) — ${u.dose}, ${u.frequencia_uso}`,
   }));
 }
 
