@@ -1,0 +1,5 @@
+node_modules
+dist
+# A URL da API vem do build arg; um .env local não deve entrar na imagem.
+.env
+*.local

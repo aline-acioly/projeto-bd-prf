@@ -1,5 +1,6 @@
-# Sistema de Avaliação PRF — banco, pgAdmin e API
+# Sistema de Avaliação PRF — banco, pgAdmin, API e frontend
 # Subir tudo:  docker compose up -d --build
+# Frontend:    http://localhost:8080
 # API:         http://localhost:8000  (documentação em http://localhost:8000/docs)
 # pgAdmin:     http://localhost:16543  (login abaixo)
 # Conexão no pgAdmin: host = postgres | porta = 5432 | user/senha = os do serviço postgres
@@ -45,6 +46,18 @@ services:
     depends_on:
       postgres:
         condition: service_healthy   # espera o pg_isready, e não só o container subir
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Endereço da API visto pelo navegador (no PC), não de dentro da rede do compose.
+        VITE_API_URL: http://localhost:8000
+    container_name: prf-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
 
 volumes:
   pgdata:
