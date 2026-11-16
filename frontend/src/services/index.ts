@@ -1,0 +1,10 @@
+export { ApiError, mensagemDeErro, requisitar, segmento } from "./api";
+export { avaliacoesApi } from "./avaliacoes";
+export { consultasApi } from "./consultas";
+export { contatosApi } from "./contatos";
+export { intervencoesApi } from "./intervencoes";
+export { medicamentosApi } from "./medicamentos";
+export { opcoesNescApi } from "./opcoesNesc";
+export { estagiariosApi, pacientesApi, profissionaisApi } from "./pessoas";
+export { suspeitasApi } from "./suspeitas";
+export { usoMedicamentosApi } from "./usoMedicamentos";

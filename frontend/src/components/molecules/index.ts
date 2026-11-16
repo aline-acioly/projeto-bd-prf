@@ -1,3 +1,3 @@
-// Combinações simples: FormField (Label + Input + erro), SearchBar, ConfirmButton.
-// Os componentes nascem na Etapa 4, conforme as telas precisarem.
-export {};
+// Combinações simples de atoms.
+export { FormField } from "./FormField";
+export { Modal } from "./Modal";

@@ -1,3 +1,6 @@
-// Peças indivisíveis: Button, Input, Select, Label, Badge, Spinner.
-// Os componentes nascem na Etapa 4, escritos do zero com Tailwind.
-export {};
+// Peças indivisíveis, escritas do zero com Tailwind.
+export { Button } from "./Button";
+export { Input } from "./Input";
+export { Label } from "./Label";
+export { Select } from "./Select";
+export type { OpcaoSelect } from "./Select";
