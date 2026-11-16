@@ -1,8 +1,9 @@
-# Sistema de Avaliação PRF — ambiente de banco (Etapa 3)
-# Subir:   docker compose up -d
-# pgAdmin: http://localhost:16543  (login abaixo)
+# Sistema de Avaliação PRF — banco, pgAdmin e API
+# Subir tudo:  docker compose up -d --build
+# API:         http://localhost:8000  (documentação em http://localhost:8000/docs)
+# pgAdmin:     http://localhost:16543  (login abaixo)
 # Conexão no pgAdmin: host = postgres | porta = 5432 | user/senha = os do serviço postgres
-# Recriar o banco do zero (re-executa db/init/*.sql): docker compose down -v && docker compose up -d
+# Recriar o banco do zero (re-executa db/init/*.sql): docker compose down -v && docker compose up -d --build
 
 services:
   postgres:
@@ -33,16 +34,17 @@ services:
     depends_on:
       - postgres
 
-  # Etapa 3: descomente quando o backend existir (pasta ./backend com Dockerfile)
-  # backend:
-  #   build: ./backend
-  #   environment:
-  #     DATABASE_URL: postgresql://prf:prf123@postgres:5432/avaliacao_prf
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
+  backend:
+    build: ./backend
+    container_name: prf-backend
+    environment:
+      # Dentro da rede do compose o banco é o host "postgres", na porta interna 5432.
+      DATABASE_URL: postgresql://prf:prf123@postgres:5432/avaliacao_prf
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy   # espera o pg_isready, e não só o container subir
 
 volumes:
   pgdata:
