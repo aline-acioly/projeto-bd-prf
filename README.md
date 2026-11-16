@@ -41,13 +41,17 @@ projeto-bd-prf/
     ├── Dockerfile            # build com Node, servido pelo nginx
     └── src/
         ├── components/
-        │   ├── atoms/        # Button, Input, Select, Label
-        │   ├── molecules/    # FormField, Modal, SqlBlock
-        │   ├── organisms/    # DataTable, ResourceForm, CrudSection, RelatorioSection, Toast...
+        │   ├── atoms/        # Badge, Button, Input, Label, Select, Tooltip
+        │   │                 # (+ badgesDoDominio: tipo, situação, papel, categoria NESC)
+        │   ├── molecules/    # FormField, Modal, PageHeader, SqlBlock, StatCard
+        │   ├── organisms/    # ConfirmDialog, CrudSection, DataTable, RelatorioSection,
+        │   │                 # ResourceForm, Sidebar, Toast
         │   └── templates/    # MainLayout (menu lateral + conteúdo)
-        ├── pages/            # uma página por recurso, ficha do paciente e relatórios
+        ├── pages/            # Início, uma página por recurso, ficha do paciente e relatórios
         ├── services/         # cliente HTTP e uma função por rota da API
-        ├── hooks/, types/, utils/
+        ├── hooks/            # useListaPaginada, useToast
+        ├── types/            # tipos que espelham as respostas da API
+        └── utils/            # formatação, rótulos, situação da consulta, opções dos selects
 ```
 
 Uma requisição percorre `controllers → services → repositories → models`, e os `schemas` validam a entrada e formatam a saída.
@@ -134,10 +138,16 @@ Mais detalhes, incluindo a organização em Atomic Design, em [`frontend/README.
 
 ## Interface
 
-- **Início:** cards com os números principais e a lista dos próximos atendimentos (consultas ainda sem avaliação).
+- **Início:** cards com os números principais e a lista de atendimentos pendentes (consultas sem avaliação, as atrasadas primeiro).
 - **Menu lateral:** uma página por recurso, cada uma com tabela paginada, formulário de criar/editar num modal e exclusão com confirmação.
 - **Chaves:** são escolhidas em selects carregados da API, nunca digitadas. Isso vale para paciente, atendente, supervisor, medicamento, medicamento em uso, opção NESC, consulta, avaliação e suspeita.
-- **Ficha do paciente:** em Pacientes → Abrir, mostra os contatos de emergência e os medicamentos em uso, cada um com o seu CRUD.
+- **Ficha do paciente:** acessada clicando no nome do paciente na tabela de Pacientes. Mostra os contatos de emergência e os medicamentos em uso, cada um com o seu CRUD.
+- **Situação da consulta:** tem três estados: **Realizada** (tem avaliação), **Não realizada** (sem avaliação e com data anterior a hoje) e **Agendada** (sem avaliação, de hoje em diante). Não existe coluna no banco para isso: a situação é calculada a partir da avaliação e da data, em `frontend/src/utils/situacao.ts`. O comentário desse arquivo traz a mesma regra em SQL (`CASE` com `LEFT JOIN` em AVALIACAO).
+- **Rótulos:** por causa dos CHECKs, o banco guarda valores canônicos (`'retorno'`, `'quantitativo'`, `'orientação sobre medicamento'`...). As telas mostram rótulos ("Retorno", "Quantitativo", "Orientação sobre medicamento"), e os selects continuam enviando o valor do banco. Os Relatórios mostram o resultado cru do SQL, sem rótulos; só data, CPF e telefone são formatados.
+- **Regras nos formulários:** os campos que dependem das triggers têm um tooltip (?) explicando a regra:
+  - avaliação de origem do retorno (R2);
+  - supervisor da avaliação (R3);
+  - medicamento da suspeita (R4).
 - **Erros:** qualquer erro da API aparece num aviso (toast) com a mensagem do backend, inclusive as mensagens das triggers.
 - **Relatórios:** a página mostra o resultado de cada consulta e, embaixo, o SQL executado, num bloco recolhível.
 
@@ -174,7 +184,7 @@ Ficam em `/relatorios` e só têm `GET`. As consultas são SQL puro, executado c
 | `/relatorios/pacientes-polifarmacia` | pacientes com mais de um medicamento em uso | GROUP BY + HAVING |
 | `/relatorios/intervencoes-por-tipo` | intervenções por tipo | GROUP BY + ORDER BY |
 | `/relatorios/resumo` | contagens da página Início (pacientes, consultas sem avaliação, retornos pendentes, suspeitas) | subconsultas escalares + NOT EXISTS |
-| `/relatorios/proximos-atendimentos` | consultas ainda sem avaliação, por data, com o papel do atendente | NOT EXISTS + CASE WHEN EXISTS |
+| `/relatorios/proximos-atendimentos` | lista "Atendimentos pendentes" da Início: consultas ainda sem avaliação, por data (as atrasadas primeiro), com o papel do atendente | NOT EXISTS + CASE WHEN EXISTS |
 
 Pacientes, profissionais e estagiários são subclasses de PESSOA. O `POST` grava PESSOA e a subclasse numa única transação, e o `GET` devolve os campos das duas juntos. Nas chaves compostas, o `PATCH` não altera a chave (o CPF de uma pessoa, o nome de um contato, o medicamento de um uso).
 
@@ -191,6 +201,7 @@ Toda resposta de erro tem o formato `{"erro": "...", "codigo": "..."}`:
 | Validação do Pydantic (campo ausente, CPF fora do padrão, tipo fora da lista) | 422 | `validacao` |
 | Não encontrado | 404 | `http_404` |
 | PK, UNIQUE, FK ou CHECK do banco | 409 | SQLSTATE (`23505`, `23503`, `23514`...); `http_409` no CPF repetido, que é checado antes de gravar |
+| Valor que o banco recusa pelo tipo ou pela faixa (`DataError`), ou texto com caractere nulo (`\x00`) | 422 | SQLSTATE do banco; vazio no caractere nulo |
 | Regra de trigger (`RAISE EXCEPTION`) | 400 | `P0001` |
 | Erro inesperado | 500 | mensagem genérica, sem detalhes internos |
 
@@ -204,3 +215,5 @@ Ficam em `db/init/02_triggers.sql`. São regras que PK, FK e CHECK não consegue
 4. **R4. Suspeita válida:** o medicamento suspeito é de um uso do mesmo paciente da consulta avaliada, e a data de registro não pode ser anterior à avaliação.
 
 Ao todo são 6 triggers. Outras regras ficam em constraints: retorno exige avaliação de origem (CHECK `ck_consulta_origem`), cada consulta tem no máximo uma avaliação (UNIQUE `uq_avaliacao_consulta`), e a suspeita só pode citar um medicamento que o paciente usa (FK composta `fk_suspeita_uso`).
+
+**Limitação conhecida:** a R3 só roda no INSERT/UPDATE de AVALIACAO, e a R4 só no INSERT/UPDATE de SUSPEITA. Por isso, se uma consulta for alterada depois de já ter avaliação, nenhuma das duas é conferida de novo. Isso vale para a troca de atendente, de data e também de paciente, que afeta a R4. O mesmo acontece quando a data de uma avaliação muda depois que ela já tem suspeitas (R4). Os quatro casos foram testados e o banco aceita o UPDATE. A correção seria uma trigger de UPDATE em CONSULTA, por exemplo estendendo a `tg_consulta_valida`, que já roda no UPDATE, para reconferir a avaliação e as suspeitas da consulta. Para cobrir a data da avaliação, `tg_avaliacao_valida` precisaria fazer o mesmo com as suspeitas.
