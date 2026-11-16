@@ -1,0 +1,78 @@
+# Contatos de emergência (entidade fraca de PACIENTE, chave: cpf + nome).
+# O status esperado está no título de cada requisição.
+# Rode "Criar" antes de "Atualizar", "Contato repetido" e "Apagar", que usam o contato criado.
+# Rode "Apagar" no fim para o banco voltar ao seed.
+# Nome com espaço ou acento vai codificado na URL: "Pedro Lima" → Pedro%20Lima.
+
+@baseUrl = http://localhost:8000
+@cpf = 10000000004
+@nome = Mário Conceição
+@nomeUrl = M%C3%A1rio%20Concei%C3%A7%C3%A3o
+
+### Listar os contatos de um paciente (200)
+GET {{baseUrl}}/pacientes/10000000001/contatos
+
+### Listar com paginação (200)
+GET {{baseUrl}}/pacientes/10000000001/contatos?skip=0&limit=1
+
+### Buscar por nome, com espaço na URL (200)
+GET {{baseUrl}}/pacientes/10000000001/contatos/Pedro%20Lima
+
+### Criar (201)
+POST {{baseUrl}}/pacientes/{{cpf}}/contatos
+Content-Type: application/json
+
+{
+  "nome": "{{nome}}",
+  "telefone": "81980000005",
+  "relacao": "Sobrinho"
+}
+
+### Atualizar telefone e relação; o nome é parte da chave e não muda (200)
+PATCH {{baseUrl}}/pacientes/{{cpf}}/contatos/{{nomeUrl}}
+Content-Type: application/json
+
+{
+  "telefone": "81980000006",
+  "relacao": "Neto"
+}
+
+### Apagar (204)
+DELETE {{baseUrl}}/pacientes/{{cpf}}/contatos/{{nomeUrl}}
+
+### Erro: paciente inexistente (404)
+GET {{baseUrl}}/pacientes/99999999999/contatos
+
+### Erro: CPF que não é paciente, checado antes de gravar (404)
+POST {{baseUrl}}/pacientes/20000000001/contatos
+Content-Type: application/json
+
+{
+  "nome": "Contato do Profissional",
+  "telefone": "81980000007",
+  "relacao": "Irmão"
+}
+
+### Erro: contato que não existe (404)
+GET {{baseUrl}}/pacientes/10000000001/contatos/Fulano%20de%20Tal
+
+### Erro: contato repetido, mesmo paciente e nome (409)
+POST {{baseUrl}}/pacientes/10000000001/contatos
+Content-Type: application/json
+
+{
+  "nome": "Pedro Lima",
+  "telefone": "81980000001",
+  "relacao": "Filho"
+}
+
+### Erro: alterar o nome não é permitido (422)
+PATCH {{baseUrl}}/pacientes/10000000001/contatos/Pedro%20Lima
+Content-Type: application/json
+
+{
+  "nome": "Pedro Lima Neto"
+}
+
+### Erro: CPF inválido na URL (422)
+GET {{baseUrl}}/pacientes/123/contatos

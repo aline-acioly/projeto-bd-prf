@@ -4,7 +4,8 @@ from app.schemas.comum import Cpf, EntradaBase
 
 
 class ContatoEmergenciaCreate(EntradaBase):
-    nome: str = Field(max_length=150)
+    # O nome é parte da chave e vai na URL: vazio não poderia ser buscado depois.
+    nome: str = Field(min_length=1, max_length=150)
     telefone: str = Field(max_length=20)
     relacao: str = Field(max_length=50)
 

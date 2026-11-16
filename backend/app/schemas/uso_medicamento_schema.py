@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.comum import Cpf, EntradaBase, Id
+from app.schemas.medicamento_schema import MedicamentoResponse
 
 
 class UsoMedicamentoCreate(EntradaBase):
@@ -24,3 +25,5 @@ class UsoMedicamentoResponse(BaseModel):
     dose: str
     via_administracao: str
     frequencia_uso: str
+    # Nome e forma do catálogo, para a tela não precisar buscar o medicamento à parte.
+    medicamento: MedicamentoResponse

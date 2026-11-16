@@ -4,6 +4,8 @@ from app.controllers.opcao_nesc_controller import OpcaoNescRouter
 from app.controllers.paciente_controller import PacienteRouter
 from app.controllers.profissional_saude_controller import ProfissionalSaudeRouter
 from app.controllers.estagiario_controller import EstagiarioRouter
+from app.controllers.contato_emergencia_controller import ContatoEmergenciaRouter
+from app.controllers.uso_medicamento_controller import UsoMedicamentoRouter
 from app.database.database import get_db
 from app.infra.errors import registrar_handlers
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,6 +31,8 @@ app.include_router(OpcaoNescRouter)
 app.include_router(PacienteRouter)
 app.include_router(ProfissionalSaudeRouter)
 app.include_router(EstagiarioRouter)
+app.include_router(ContatoEmergenciaRouter)
+app.include_router(UsoMedicamentoRouter)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:8080"],

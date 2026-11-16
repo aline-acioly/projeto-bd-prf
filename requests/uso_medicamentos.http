@@ -1,0 +1,87 @@
+# Medicamentos em uso (relacionamento USA, paciente N:M medicamento).
+# Chave: cpf do paciente + id_medicamento. O status esperado está no título de cada requisição.
+# Rode "Criar" antes de "Atualizar", "Mesmo medicamento duas vezes" e "Apagar".
+# Rode "Apagar" no fim para o banco voltar ao seed.
+
+@baseUrl = http://localhost:8000
+@cpf = 10000000004
+@idMedicamento = 1
+
+### Listar os medicamentos de um paciente, com nome e forma do catálogo (200)
+GET {{baseUrl}}/pacientes/10000000002/medicamentos
+
+### Listar com paginação (200)
+GET {{baseUrl}}/pacientes/10000000002/medicamentos?skip=1&limit=1
+
+### Buscar um uso (200)
+GET {{baseUrl}}/pacientes/10000000001/medicamentos/1
+
+### Criar: José passa a usar Losartana (201)
+POST {{baseUrl}}/pacientes/{{cpf}}/medicamentos
+Content-Type: application/json
+
+{
+  "id_medicamento": {{idMedicamento}},
+  "dose": "25 mg",
+  "via_administracao": "oral",
+  "frequencia_uso": "1x ao dia"
+}
+
+### Atualizar só dose, via e frequência (200)
+PATCH {{baseUrl}}/pacientes/{{cpf}}/medicamentos/{{idMedicamento}}
+Content-Type: application/json
+
+{
+  "dose": "50 mg",
+  "frequencia_uso": "2x ao dia"
+}
+
+### Apagar (204)
+DELETE {{baseUrl}}/pacientes/{{cpf}}/medicamentos/{{idMedicamento}}
+
+### Erro: paciente inexistente (404)
+POST {{baseUrl}}/pacientes/99999999999/medicamentos
+Content-Type: application/json
+
+{
+  "id_medicamento": 1,
+  "dose": "50 mg",
+  "via_administracao": "oral",
+  "frequencia_uso": "1x ao dia"
+}
+
+### Erro: o paciente não usa este medicamento (404)
+GET {{baseUrl}}/pacientes/10000000004/medicamentos/1
+
+### Erro: medicamento inexistente, recusado pela FK (409)
+POST {{baseUrl}}/pacientes/10000000004/medicamentos
+Content-Type: application/json
+
+{
+  "id_medicamento": 9999,
+  "dose": "50 mg",
+  "via_administracao": "oral",
+  "frequencia_uso": "1x ao dia"
+}
+
+### Erro: mesmo medicamento duas vezes para o paciente (409)
+POST {{baseUrl}}/pacientes/10000000001/medicamentos
+Content-Type: application/json
+
+{
+  "id_medicamento": 1,
+  "dose": "100 mg",
+  "via_administracao": "oral",
+  "frequencia_uso": "1x ao dia"
+}
+
+### Erro: trocar o medicamento pelo PATCH não é permitido (422)
+PATCH {{baseUrl}}/pacientes/10000000001/medicamentos/1
+Content-Type: application/json
+
+{
+  "id_medicamento": 3
+}
+
+### Erro: apagar uso que tem suspeita registrada (409)
+DELETE {{baseUrl}}/pacientes/10000000001/medicamentos/2
