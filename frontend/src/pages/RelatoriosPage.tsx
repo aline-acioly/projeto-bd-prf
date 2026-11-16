@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Badge, BadgeCategoriaNesc, Select, type OpcaoSelect } from "@/components/atoms";
+import { Select, type OpcaoSelect } from "@/components/atoms";
 import { PageHeader } from "@/components/molecules";
 import { RelatorioSection, type ColunaTabela } from "@/components/organisms";
 import { MainLayout } from "@/components/templates";
@@ -17,22 +17,23 @@ import type {
 } from "@/types";
 import { formatarCpf, formatarData, formatarTelefone, opcoesPacientes } from "@/utils";
 
+// Nas tabelas de relatório a célula traz só o valor que o SQL devolveu, sem componentes
+// (badges etc.) nem rótulos; só data, CPF e telefone são formatados.
 const ou = (valor: string | number | null) => (valor === null ? "—" : valor);
 
 const COLUNAS_HISTORICO: ColunaTabela<HistoricoPacienteLinha>[] = [
   { titulo: "Consulta", valor: (l) => `#${l.id_consulta}`, mono: true },
   { titulo: "Data", valor: (l) => formatarData(l.data_agendada) },
-  // Relatórios mostram os valores como o SQL devolve, sem os rótulos de exibição.
-  { titulo: "Tipo", valor: (l) => <Badge variante={l.tipo === "retorno" ? "contorno" : "neutro"}>{l.tipo}</Badge> },
+    { titulo: "Tipo", valor: (l) => l.tipo },
   { titulo: "Atendente", valor: (l) => l.atendente },
-  { titulo: "Avaliação", valor: (l) => (l.id_avaliacao === null ? "ainda não avaliada" : `#${l.id_avaliacao} · ${formatarData(l.data_realizacao)}`) },
+  { titulo: "Avaliação", valor: (l) => (l.id_avaliacao === null ? "—" : `#${l.id_avaliacao} · ${formatarData(l.data_realizacao)}`) },
   { titulo: "Medicamento suspeito", valor: (l) => ou(l.medicamento) },
-  { titulo: "Categoria NESC", valor: (l) => (l.categoria_nesc ? <BadgeCategoriaNesc categoria={l.categoria_nesc} /> : "—") },
+  { titulo: "Categoria NESC", valor: (l) => ou(l.categoria_nesc) },
   { titulo: "Problema", valor: (l) => ou(l.problema) },
 ];
 
 const COLUNAS_CATEGORIA: ColunaTabela<SuspeitasPorCategoriaLinha>[] = [
-  { titulo: "Categoria NESC", valor: (l) => <BadgeCategoriaNesc categoria={l.categoria} /> },
+  { titulo: "Categoria NESC", valor: (l) => l.categoria },
   { titulo: "Suspeitas", valor: (l) => l.total, mono: true },
 ];
 
