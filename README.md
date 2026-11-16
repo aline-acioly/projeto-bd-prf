@@ -2,20 +2,20 @@
 
 Projeto da disciplina de Banco de Dados (CIn/UFPE). É um sistema de acompanhamento em farmacoterapia: registra pacientes, profissionais de saúde e estagiários, as consultas agendadas, a avaliação feita em cada consulta, as suspeitas de problemas com os medicamentos que o paciente usa (classificadas pela NESC: Necessidade, Efetividade, Segurança e Cumprimento) e as intervenções feitas sobre cada suspeita.
 
-O esquema (12 tabelas, domínio `TIPO_CPF`, PKs, FKs, UNIQUEs, CHECKs e triggers) é criado pelos scripts SQL de `db/init`. A API só mapeia essas tabelas e traduz os erros do banco em respostas em português.
+O esquema (12 tabelas, domínio `TIPO_CPF`, PKs, FKs, UNIQUEs, CHECKs e triggers) é criado pelos scripts SQL de `db/init`. A API só mapeia essas tabelas e traduz os erros do banco em respostas em português. A interface web tem uma página por recurso e uma página de relatórios com as consultas SQL da disciplina.
 
 ## Stack
 
 - **Banco de dados:** PostgreSQL 16, com pgAdmin
 - **Backend:** Python 3.12, FastAPI, SQLAlchemy 2 e Pydantic v2
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS e React Router, organizado em Atomic Design (em construção)
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS e React Router, organizado em Atomic Design e servido pelo nginx no Docker
 - **Ambiente:** Docker Compose
 
 ## Estrutura de pastas
 
 ```
 projeto-bd-prf/
-├── docker-compose.yml        # postgres, pgadmin e backend
+├── docker-compose.yml        # postgres, pgadmin, backend e frontend
 ├── db/init/                  # rodam na 1ª subida do Postgres, em ordem
 │   ├── 01_schema.sql         # tabelas, domínio TIPO_CPF e constraints
 │   ├── 02_triggers.sql       # regras R1 a R4
@@ -28,27 +28,30 @@ projeto-bd-prf/
 │       ├── main.py           # cria a API, registra rotas, CORS e handlers de erro
 │       ├── controllers/      # rotas HTTP (uma por recurso)
 │       ├── services/         # regras da aplicação (404, checagens antes de gravar)
-│       ├── repositories/     # consultas e gravações com SQLAlchemy
+│       ├── repositories/     # consultas e gravações com SQLAlchemy (relatórios em SQL puro)
 │       ├── models/           # mapeamento das tabelas existentes (sem create_all)
 │       ├── schemas/          # entrada e saída com Pydantic (Create, Update, Response)
 │       ├── database/         # engine e sessão
 │       └── infra/errors.py   # erros do banco → {"erro", "codigo"} em português
 ├── requests/                 # um .http por recurso (extensão REST Client do VS Code)
-└── frontend/
+└── frontend/                 # detalhes em frontend/README.md
+    ├── Dockerfile            # build com Node, servido pelo nginx
     └── src/
         ├── components/
-        │   ├── atoms/        # peças indivisíveis
-        │   ├── molecules/    # combinações simples de atoms
-        │   ├── organisms/    # blocos completos, como o menu lateral
-        │   └── templates/    # estrutura das páginas
-        └── pages/            # telas ligadas às rotas
+        │   ├── atoms/        # Button, Input, Select, Label
+        │   ├── molecules/    # FormField, Modal, SqlBlock
+        │   ├── organisms/    # DataTable, ResourceForm, CrudSection, RelatorioSection, Toast...
+        │   └── templates/    # MainLayout (menu lateral + conteúdo)
+        ├── pages/            # uma página por recurso, ficha do paciente e relatórios
+        ├── services/         # cliente HTTP e uma função por rota da API
+        ├── hooks/, types/, utils/
 ```
 
 Uma requisição percorre `controllers → services → repositories → models`, e os `schemas` validam a entrada e formatam a saída.
 
 ## Como rodar (Docker)
 
-Pré-requisito: Docker com Docker Compose.
+Pré-requisito: Docker com Docker Compose. Um único comando sobe tudo: frontend, backend, banco e pgAdmin. O banco já vem com o esquema, as triggers e o seed.
 
 ```bash
 docker compose up -d --build
@@ -56,10 +59,12 @@ docker compose up -d --build
 
 | Serviço | Endereço | Acesso |
 |---|---|---|
+| Frontend | http://localhost:8080 | a interface do sistema |
 | API | http://localhost:8000 | `/health` confere a conexão com o banco |
 | Documentação da API (Swagger) | http://localhost:8000/docs | |
 | pgAdmin | http://localhost:16543 | `admin@prf.com` / `admin123` |
-| PostgreSQL (do seu PC) | `localhost:15432` | banco `avaliacao_prf`, usuário `prf`, senha `prf123` |
+
+O PostgreSQL também fica acessível do seu PC em `localhost:15432` (banco `avaliacao_prf`, usuário `prf`, senha `prf123`).
 
 No pgAdmin, cadastre o servidor com host `postgres`, porta `5432` e o usuário e senha acima.
 
@@ -85,6 +90,27 @@ uvicorn app.main:app --reload
 
 O `.env` aponta para `localhost:15432`, e o serviço `backend` do compose usa o host `postgres` na porta `5432`.
 
+## Como rodar o frontend local
+
+Com a API em http://localhost:8000, pelo Docker ou local. Pare o container do frontend, porque ele usa a mesma porta 8080:
+
+```bash
+docker compose stop frontend
+cd frontend
+npm install
+npm run dev                         # http://localhost:8080
+```
+
+Mais detalhes, incluindo a organização em Atomic Design, em [`frontend/README.md`](frontend/README.md).
+
+## Interface
+
+- **Menu lateral:** uma página por recurso, cada uma com tabela paginada, formulário de criar/editar num modal e exclusão com confirmação.
+- **Chaves:** são escolhidas em selects carregados da API, nunca digitadas. Isso vale para paciente, atendente, supervisor, medicamento, medicamento em uso, opção NESC, consulta, avaliação e suspeita.
+- **Ficha do paciente:** em Pacientes → Abrir, mostra os contatos de emergência e os medicamentos em uso, cada um com o seu CRUD.
+- **Erros:** qualquer erro da API aparece num aviso (toast) com a mensagem do backend, inclusive as mensagens das triggers.
+- **Relatórios:** a página mostra o resultado de cada consulta e, embaixo, o SQL executado, num bloco recolhível.
+
 ## Rotas
 
 Todo recurso tem `GET` de lista (com `?skip=` e `?limit=`, padrão 50 e máximo 200), `GET` por chave, `POST` (201), `PATCH` (só os campos enviados) e `DELETE` (204).
@@ -103,11 +129,26 @@ Todo recurso tem `GET` de lista (com `?skip=` e `?limit=`, padrão 50 e máximo 
 | Suspeitas | `/suspeitas` | `id_suspeita` | `?id_avaliacao=` |
 | Intervenções | `/intervencoes` | `id_intervencao` | `?id_suspeita=` |
 
+### Relatórios
+
+Ficam em `/relatorios` e só têm `GET`. As consultas são SQL puro, executado com `text()` do SQLAlchemy (`backend/app/repositories/relatorio_repository.py`). Cada resposta traz `{"sql": "...", "linhas": [...]}`: o comando executado e o resultado.
+
+| Rota | O que mostra | SQL |
+|---|---|---|
+| `/relatorios/historico-paciente/{cpf}` | consultas, avaliações, medicamentos suspeitos e problema NESC de um paciente | JOIN e LEFT JOIN |
+| `/relatorios/suspeitas-por-categoria` | suspeitas por categoria NESC | GROUP BY + COUNT |
+| `/relatorios/pacientes-sem-avaliacao` | pacientes que nunca foram avaliados | NOT EXISTS |
+| `/relatorios/retornos-pendentes` | retornos ainda sem avaliação | NOT EXISTS |
+| `/relatorios/avaliacoes-estagiarios` | avaliações de estagiários e o supervisor de cada uma | PESSOA com aliases |
+| `/relatorios/medicamentos-mais-suspeitas` | medicamento(s) com mais suspeitas, com empates | HAVING + `>= ALL` |
+| `/relatorios/pacientes-polifarmacia` | pacientes com mais de um medicamento em uso | GROUP BY + HAVING |
+| `/relatorios/intervencoes-por-tipo` | intervenções por tipo | GROUP BY + ORDER BY |
+
 Pacientes, profissionais e estagiários são subclasses de PESSOA. O `POST` grava PESSOA e a subclasse numa única transação, e o `GET` devolve os campos das duas juntos. Nas chaves compostas, o `PATCH` não altera a chave (o CPF de uma pessoa, o nome de um contato, o medicamento de um uso).
 
 ### Exemplos de requisição
 
-A pasta `requests/` tem um `.http` por recurso: um exemplo de cada rota e os casos de erro (CHECK, UNIQUE, FK e cada trigger), com o status esperado no título. Abra no VS Code com a extensão REST Client e clique em "Send Request". A sequência "Criar → Atualizar → Apagar" de cada arquivo deixa o banco igual ao seed.
+A pasta `requests/` tem um `.http` por recurso, mais o `relatorios.http`: um exemplo de cada rota e os casos de erro (CHECK, UNIQUE, FK e cada trigger), com o status esperado no título. Abra no VS Code com a extensão REST Client e clique em "Send Request". A sequência "Criar → Atualizar → Apagar" de cada arquivo deixa o banco igual ao seed.
 
 ### Erros
 
