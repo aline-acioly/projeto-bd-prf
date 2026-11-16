@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { BadgePapel, BadgeStatusConsulta, BadgeTipoConsulta, Select } from "@/components/atoms";
+import { BadgePapel, BadgeSituacaoConsulta, BadgeTipoConsulta, Select } from "@/components/atoms";
 import { CrudSection, type CampoFormulario, type ColunaTabela } from "@/components/organisms";
 import { MainLayout } from "@/components/templates";
 import { consultasApi } from "@/services";
@@ -11,6 +11,7 @@ import {
   opcoesAvaliacoes,
   opcoesComRotulo,
   opcoesPacientes,
+  situacaoConsulta,
 } from "@/utils";
 
 const OPCOES_TIPO = opcoesComRotulo(TIPOS_CONSULTA, ROTULOS_TIPO_CONSULTA);
@@ -56,7 +57,10 @@ const COLUNAS: ColunaTabela<Consulta>[] = [
       </span>
     ),
   },
-  { titulo: "Situação", valor: (c) => <BadgeStatusConsulta realizada={c.avaliacao !== null} /> },
+  {
+    titulo: "Situação",
+    valor: (c) => <BadgeSituacaoConsulta situacao={situacaoConsulta(c.data_agendada, c.avaliacao !== null)} />,
+  },
   { titulo: "Paciente", valor: (c) => c.paciente.nome },
   {
     titulo: "Atendente",

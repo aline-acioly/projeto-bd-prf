@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 // Mesmo padrão de variante do GFD: união de strings + Record de configuração.
-export type VarianteBadge = "primario" | "acento" | "contorno" | "neutro";
+export type VarianteBadge = "primario" | "acento" | "perigo" | "contorno" | "neutro";
 
 interface BadgeProps {
   variante?: VarianteBadge;
@@ -14,6 +14,7 @@ const VARIANTES: Record<VarianteBadge, string> = {
   acento: "border-accent-100 bg-accent-50 text-accent-700",
   contorno: "border-primary-500 bg-transparent text-primary-700",
   neutro: "border-stone-200 bg-stone-100 text-stone-700",
+  perigo: "border-red-200 bg-red-50 text-red-700",
 };
 
 export function Badge({ variante = "neutro", children, className = "" }: BadgeProps) {

@@ -7,4 +7,4 @@ export { Label } from "./Label";
 export { Select } from "./Select";
 export type { OpcaoSelect } from "./Select";
 export { Tooltip } from "./Tooltip";
-export { BadgeCategoriaNesc, BadgePapel, BadgeStatusConsulta, BadgeTipoConsulta } from "./badgesDoDominio";
+export { BadgeCategoriaNesc, BadgePapel, BadgeSituacaoConsulta, BadgeTipoConsulta } from "./badgesDoDominio";

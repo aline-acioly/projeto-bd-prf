@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BadgePapel, BadgeStatusConsulta, BadgeTipoConsulta } from "@/components/atoms";
+import { BadgePapel, BadgeSituacaoConsulta, BadgeTipoConsulta } from "@/components/atoms";
 import { PageHeader, StatCard } from "@/components/molecules";
 import { DataTable, type ColunaTabela } from "@/components/organisms";
 import { MainLayout } from "@/components/templates";
 import { useToast } from "@/hooks";
 import { mensagemDeErro, relatoriosApi } from "@/services";
 import type { ProximoAtendimentoLinha, ResumoLinha } from "@/types";
-import { formatarData } from "@/utils";
+import { formatarData, situacaoConsulta } from "@/utils";
 
 const COLUNAS: ColunaTabela<ProximoAtendimentoLinha>[] = [
   { titulo: "Data", valor: (l) => formatarData(l.data_agendada) },
@@ -22,7 +22,8 @@ const COLUNAS: ColunaTabela<ProximoAtendimentoLinha>[] = [
     ),
   },
   { titulo: "Tipo", valor: (l) => <BadgeTipoConsulta tipo={l.tipo} /> },
-  { titulo: "Situação", valor: () => <BadgeStatusConsulta realizada={false} /> },
+  // Todas aqui estão sem avaliação: a data decide entre "Não realizada" e "Agendada".
+  { titulo: "Situação", valor: (l) => <BadgeSituacaoConsulta situacao={situacaoConsulta(l.data_agendada, false)} /> },
 ];
 
 export function InicioPage() {
@@ -62,7 +63,7 @@ export function InicioPage() {
         <StatCard
           rotulo="Consultas sem avaliação"
           valor={resumo?.consultas_sem_avaliacao ?? null}
-          descricao="Agendadas e ainda não realizadas."
+          descricao="Sem avaliação: as atrasadas e as agendadas."
           variante="acento"
         />
         <StatCard
@@ -82,8 +83,8 @@ export function InicioPage() {
       <section>
         <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg">Próximos atendimentos</h2>
-            <p className="text-sm text-stone-600">Consultas ainda sem avaliação, da mais antiga para a mais nova.</p>
+            <h2 className="text-lg">Atendimentos pendentes</h2>
+            <p className="text-sm text-stone-600">Consultas ainda sem avaliação: as atrasadas primeiro, depois as próximas.</p>
           </div>
           <Link to="/consultas" className="text-sm font-medium text-primary-700 underline">
             Ver todas as consultas
