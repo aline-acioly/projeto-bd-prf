@@ -1,0 +1,3 @@
+# O pgpass e o servers.json do pgAdmin são lidos dentro de um container Linux:
+# com CRLF (checkout no Windows), a senha seria lida como "prf123\r".
+pgadmin/* text eol=lf

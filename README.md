@@ -16,6 +16,9 @@ O esquema (12 tabelas, domínio `TIPO_CPF`, PKs, FKs, UNIQUEs, CHECKs e triggers
 ```
 projeto-bd-prf/
 ├── docker-compose.yml        # postgres, pgadmin, backend e frontend
+├── pgadmin/                  # servidor "PRF" pré-cadastrado no pgAdmin
+│   ├── servers.json          # importado na 1ª subida do pgAdmin
+│   └── pgpass                # senha do banco, para o pgAdmin não pedir
 ├── db/init/                  # rodam na 1ª subida do Postgres, em ordem
 │   ├── 01_schema.sql         # tabelas, domínio TIPO_CPF e constraints
 │   ├── 02_triggers.sql       # regras R1 a R4
@@ -64,15 +67,41 @@ docker compose up -d --build
 | Documentação da API (Swagger) | http://localhost:8000/docs | |
 | pgAdmin | http://localhost:16543 | `admin@prf.com` / `admin123` |
 
-O PostgreSQL também fica acessível do seu PC em `localhost:15432` (banco `avaliacao_prf`, usuário `prf`, senha `prf123`).
-
-No pgAdmin, cadastre o servidor com host `postgres`, porta `5432` e o usuário e senha acima.
-
 Os scripts de `db/init` só rodam quando o volume do banco é criado. Para voltar ao seed:
 
 ```bash
 docker compose down -v && docker compose up -d --build
 ```
+
+### pgAdmin
+
+Ao entrar em http://localhost:16543 (`admin@prf.com` / `admin123`), o servidor **PRF** já aparece em *Servers*. Basta clicar nele: a conexão abre sem pedir senha e o banco é o `avaliacao_prf`.
+
+Como funciona:
+- O `pgadmin/servers.json` é importado na primeira subida do pgAdmin, pela variável `PGADMIN_SERVER_JSON_FILE` da imagem `dpage/pgadmin4`.
+- A senha vem do `pgadmin/pgpass`. Ao iniciar, o container copia esse arquivo para a pasta do usuário do pgAdmin com permissão 600, porque o PostgreSQL ignora um arquivo de senha com permissões abertas.
+- O pgAdmin não tem volume: a importação se repete toda vez que o container é recriado.
+
+Se o servidor não aparecer, ou se pedir senha, cadastre à mão em *Register → Server*:
+
+| Campo | Valor |
+|---|---|
+| Name | PRF (qualquer nome) |
+| Host name/address | `postgres` (o nome do serviço no compose, não `localhost`) |
+| Port | `5432` (a porta de dentro da rede do compose) |
+| Maintenance database | `avaliacao_prf` |
+| Username | `prf` |
+| Password | `prf123` |
+
+### Acesso direto ao banco (DBeaver, psql)
+
+Do seu PC, o PostgreSQL fica em `localhost:15432` (banco `avaliacao_prf`, usuário `prf`, senha `prf123`), por exemplo:
+
+```bash
+psql -h localhost -p 15432 -U prf -d avaliacao_prf
+```
+
+Essa porta é do protocolo do PostgreSQL, não HTTP: abrir `localhost:15432` no navegador não mostra nada. Para ver o banco pelo navegador, use o pgAdmin em http://localhost:16543.
 
 ## Como rodar o backend local (sem Docker para a API)
 

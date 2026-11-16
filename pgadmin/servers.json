@@ -1,0 +1,18 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "PRF",
+      "Group": "Servers",
+      "Comment": "Banco do Sistema de Avaliação PRF (serviço postgres do docker-compose)",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "avaliacao_prf",
+      "Username": "prf",
+      "ConnectionParameters": {
+        "sslmode": "prefer",
+        "connect_timeout": 10,
+        "passfile": "/pgpass"
+      }
+    }
+  }
+}

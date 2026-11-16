@@ -3,7 +3,7 @@
 # Frontend:    http://localhost:8080
 # API:         http://localhost:8000  (documentação em http://localhost:8000/docs)
 # pgAdmin:     http://localhost:16543  (login abaixo)
-# Conexão no pgAdmin: host = postgres | porta = 5432 | user/senha = os do serviço postgres
+# No pgAdmin o servidor "PRF" já vem cadastrado (pgadmin/servers.json), sem pedir senha.
 # Recriar o banco do zero (re-executa db/init/*.sql): docker compose down -v && docker compose up -d --build
 
 services:
@@ -30,6 +30,24 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@prf.com
       PGADMIN_DEFAULT_PASSWORD: admin123
+      # Modo servidor (com login). Na 1ª subida, o entrypoint da imagem importa este arquivo
+      # para o usuário acima: o servidor "PRF" já aparece cadastrado.
+      PGADMIN_CONFIG_SERVER_MODE: "True"
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - ./pgadmin/pgpass:/pgpass-prf:ro
+    # O servers.json aponta "passfile": "/pgpass", que no modo servidor fica na pasta do usuário
+    # (storage/admin_prf.com). A libpq só aceita o arquivo com permissão 600 e do próprio usuário,
+    # o que um bind mount do Windows/macOS não garante: por isso ele é copiado antes de iniciar.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - >-
+        mkdir -p -m 700 /var/lib/pgadmin/storage/admin_prf.com &&
+        cp /pgpass-prf /var/lib/pgadmin/storage/admin_prf.com/pgpass &&
+        chmod 600 /var/lib/pgadmin/storage/admin_prf.com/pgpass &&
+        exec /entrypoint.sh
     ports:
       - "16543:80"
     depends_on:
