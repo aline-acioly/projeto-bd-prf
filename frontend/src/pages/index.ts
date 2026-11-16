@@ -1,4 +1,11 @@
-export { EmConstrucaoPage } from "./EmConstrucaoPage";
+export { AvaliacoesPage } from "./AvaliacoesPage";
+export { ConsultasPage } from "./ConsultasPage";
+export { EstagiariosPage } from "./EstagiariosPage";
+export { IntervencoesPage } from "./IntervencoesPage";
 export { MedicamentosPage } from "./MedicamentosPage";
 export { default as NotFound } from "./NotFound";
 export { OpcoesNescPage } from "./OpcoesNescPage";
+export { PacienteDetalhePage } from "./PacienteDetalhePage";
+export { PacientesPage } from "./PacientesPage";
+export { ProfissionaisPage } from "./ProfissionaisPage";
+export { SuspeitasPage } from "./SuspeitasPage";

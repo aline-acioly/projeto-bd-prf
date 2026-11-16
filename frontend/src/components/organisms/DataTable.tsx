@@ -6,6 +6,12 @@ export interface ColunaTabela<T> {
   valor: (linha: T) => ReactNode;
 }
 
+/** Botão extra por linha, antes de Editar/Excluir (ex.: "Abrir"). */
+export interface AcaoTabela<T> {
+  rotulo: string;
+  onClick: (linha: T) => void;
+}
+
 interface DataTableProps<T> {
   colunas: ColunaTabela<T>[];
   linhas: T[];
@@ -13,6 +19,7 @@ interface DataTableProps<T> {
   carregando?: boolean;
   onEditar?: (linha: T) => void;
   onExcluir?: (linha: T) => void;
+  acoesExtras?: AcaoTabela<T>[];
   /** Página atual, começando em 0. */
   pagina: number;
   temProxima: boolean;
@@ -27,12 +34,13 @@ export function DataTable<T>({
   carregando,
   onEditar,
   onExcluir,
+  acoesExtras = [],
   pagina,
   temProxima,
   onMudarPagina,
   mensagemVazia = "Nenhum registro encontrado.",
 }: DataTableProps<T>) {
-  const temAcoes = Boolean(onEditar || onExcluir);
+  const temAcoes = Boolean(onEditar || onExcluir || acoesExtras.length > 0);
   const totalColunas = colunas.length + (temAcoes ? 1 : 0);
 
   return (
@@ -77,6 +85,11 @@ export function DataTable<T>({
                   {temAcoes && (
                     <td className="whitespace-nowrap px-4 py-3 text-right">
                       <div className="inline-flex gap-2">
+                        {acoesExtras.map(({ rotulo, onClick }) => (
+                          <Button key={rotulo} variante="secundario" className="px-3 py-1" onClick={() => onClick(linha)}>
+                            {rotulo}
+                          </Button>
+                        ))}
                         {onEditar && (
                           <Button variante="secundario" className="px-3 py-1" onClick={() => onEditar(linha)}>
                             Editar
