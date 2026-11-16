@@ -1,0 +1,88 @@
+# Avaliações (1:1 com a consulta). O status esperado está no título de cada requisição.
+# "Criar" guarda o id gerado (# @name): rode-o antes de "Atualizar" e "Apagar".
+# Rode "Apagar" no fim para o banco voltar ao seed.
+
+@baseUrl = http://localhost:8000
+
+### Listar, com os dados da consulta (data, paciente, atendente) (200)
+GET {{baseUrl}}/avaliacoes
+
+### Listar filtrando pelo paciente da consulta, com paginação (200)
+GET {{baseUrl}}/avaliacoes?cpf_paciente=10000000002&skip=0&limit=10
+
+### Buscar por id (200)
+GET {{baseUrl}}/avaliacoes/1
+
+### Criar: consulta 4, atendida por profissional, então sem supervisor (201)
+# @name criar
+POST {{baseUrl}}/avaliacoes
+Content-Type: application/json
+
+{
+  "id_consulta": 4,
+  "data_realizacao": "2026-11-20",
+  "cpf_supervisor": null
+}
+
+### Atualizar (200)
+PATCH {{baseUrl}}/avaliacoes/{{criar.response.body.id_avaliacao}}
+Content-Type: application/json
+
+{
+  "data_realizacao": "2026-11-21"
+}
+
+### Apagar: leva as suspeitas e intervenções por CASCADE (204)
+DELETE {{baseUrl}}/avaliacoes/{{criar.response.body.id_avaliacao}}
+
+### Erro: avaliação que não existe (404)
+GET {{baseUrl}}/avaliacoes/999
+
+### Erro: segunda avaliação para a mesma consulta, UNIQUE uq_avaliacao_consulta (409)
+POST {{baseUrl}}/avaliacoes
+Content-Type: application/json
+
+{
+  "id_consulta": 1,
+  "data_realizacao": "2026-09-02"
+}
+
+### Erro: consulta inexistente, recusada pela FK (409)
+POST {{baseUrl}}/avaliacoes
+Content-Type: application/json
+
+{
+  "id_consulta": 999,
+  "data_realizacao": "2026-11-01"
+}
+
+### Erro: consulta de estagiário sem supervisor — trigger R3 (400)
+POST {{baseUrl}}/avaliacoes
+Content-Type: application/json
+
+{
+  "id_consulta": 2,
+  "data_realizacao": "2026-09-03"
+}
+
+### Erro: consulta de profissional com supervisor — trigger R3 (400)
+POST {{baseUrl}}/avaliacoes
+Content-Type: application/json
+
+{
+  "id_consulta": 4,
+  "data_realizacao": "2026-11-20",
+  "cpf_supervisor": "20000000002"
+}
+
+### Erro: avaliação antes da data da consulta — trigger R3 (400)
+POST {{baseUrl}}/avaliacoes
+Content-Type: application/json
+
+{
+  "id_consulta": 4,
+  "data_realizacao": "2026-11-01"
+}
+
+### Erro: apagar avaliação que originou uma consulta de retorno (409)
+DELETE {{baseUrl}}/avaliacoes/1

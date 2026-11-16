@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 from app.schemas.comum import Cpf, EntradaBase, Id
+from app.schemas.consulta_schema import ConsultaResponse
 
 
 class AvaliacaoCreate(EntradaBase):
@@ -25,3 +26,5 @@ class AvaliacaoResponse(BaseModel):
     id_consulta: Id
     data_realizacao: date
     cpf_supervisor: Optional[Cpf]
+    # Data, tipo, paciente e atendente vêm da consulta (1:1).
+    consulta: ConsultaResponse

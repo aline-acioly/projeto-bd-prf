@@ -25,6 +25,15 @@ class PessoaUpdate(EntradaBase):
     telefone: str = Field(None, max_length=20)
 
 
+class PessoaResumo(BaseModel):
+    """CPF e nome, para respostas que citam uma pessoa (paciente, atendente)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    cpf: Cpf
+    nome: str
+
+
 class PessoaResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

@@ -1,0 +1,77 @@
+# Suspeitas de problema com medicamento. O status esperado está no título de cada requisição.
+# "Criar" guarda o id gerado (# @name): rode-o antes de "Atualizar" e "Apagar".
+# Rode "Apagar" no fim para o banco voltar ao seed.
+
+@baseUrl = http://localhost:8000
+
+### Listar, com nome do medicamento e categoria/descrição NESC (200)
+GET {{baseUrl}}/suspeitas
+
+### Listar as suspeitas de uma avaliação, com paginação (200)
+GET {{baseUrl}}/suspeitas?id_avaliacao=2&skip=0&limit=10
+
+### Buscar por id (200)
+GET {{baseUrl}}/suspeitas/1
+
+### Criar: Losartana, que a paciente da avaliação 1 usa (201)
+# @name criar
+POST {{baseUrl}}/suspeitas
+Content-Type: application/json
+
+{
+  "data_registro": "2026-09-01",
+  "id_avaliacao": 1,
+  "cpf_paciente": "10000000001",
+  "id_medicamento": 1,
+  "id_opcao_nesc": 3
+}
+
+### Atualizar (200)
+PATCH {{baseUrl}}/suspeitas/{{criar.response.body.id_suspeita}}
+Content-Type: application/json
+
+{
+  "id_opcao_nesc": 4
+}
+
+### Apagar: leva as intervenções por CASCADE (204)
+DELETE {{baseUrl}}/suspeitas/{{criar.response.body.id_suspeita}}
+
+### Erro: suspeita que não existe (404)
+GET {{baseUrl}}/suspeitas/999
+
+### Erro: medicamento que o paciente não usa, FK composta fk_suspeita_uso (409)
+POST {{baseUrl}}/suspeitas
+Content-Type: application/json
+
+{
+  "data_registro": "2026-09-01",
+  "id_avaliacao": 1,
+  "cpf_paciente": "10000000001",
+  "id_medicamento": 3,
+  "id_opcao_nesc": 1
+}
+
+### Erro: paciente diferente do da avaliação — trigger R4 (400)
+POST {{baseUrl}}/suspeitas
+Content-Type: application/json
+
+{
+  "data_registro": "2026-09-01",
+  "id_avaliacao": 1,
+  "cpf_paciente": "10000000003",
+  "id_medicamento": 6,
+  "id_opcao_nesc": 1
+}
+
+### Erro: data de registro antes da avaliação — trigger R4 (400)
+POST {{baseUrl}}/suspeitas
+Content-Type: application/json
+
+{
+  "data_registro": "2026-08-01",
+  "id_avaliacao": 1,
+  "cpf_paciente": "10000000001",
+  "id_medicamento": 2,
+  "id_opcao_nesc": 1
+}

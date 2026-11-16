@@ -3,6 +3,8 @@ from datetime import date
 from pydantic import BaseModel, ConfigDict
 
 from app.schemas.comum import Cpf, EntradaBase, Id
+from app.schemas.medicamento_schema import MedicamentoResponse
+from app.schemas.opcao_nesc_schema import OpcaoNescResponse
 
 
 class SuspeitaCreate(EntradaBase):
@@ -30,3 +32,5 @@ class SuspeitaResponse(BaseModel):
     cpf_paciente: Cpf
     id_medicamento: Id
     id_opcao_nesc: Id
+    medicamento: MedicamentoResponse
+    opcao_nesc: OpcaoNescResponse

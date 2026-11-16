@@ -6,6 +6,10 @@ from app.controllers.profissional_saude_controller import ProfissionalSaudeRoute
 from app.controllers.estagiario_controller import EstagiarioRouter
 from app.controllers.contato_emergencia_controller import ContatoEmergenciaRouter
 from app.controllers.uso_medicamento_controller import UsoMedicamentoRouter
+from app.controllers.consulta_controller import ConsultaRouter
+from app.controllers.avaliacao_controller import AvaliacaoRouter
+from app.controllers.suspeita_controller import SuspeitaRouter
+from app.controllers.intervencao_controller import IntervencaoRouter
 from app.database.database import get_db
 from app.infra.errors import registrar_handlers
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,6 +37,10 @@ app.include_router(ProfissionalSaudeRouter)
 app.include_router(EstagiarioRouter)
 app.include_router(ContatoEmergenciaRouter)
 app.include_router(UsoMedicamentoRouter)
+app.include_router(ConsultaRouter)
+app.include_router(AvaliacaoRouter)
+app.include_router(SuspeitaRouter)
+app.include_router(IntervencaoRouter)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:8080"],

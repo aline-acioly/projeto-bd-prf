@@ -4,6 +4,7 @@ from typing import Literal, Optional
 from pydantic import BaseModel, ConfigDict, model_validator
 
 from app.schemas.comum import Cpf, EntradaBase, Id
+from app.schemas.pessoa_schema import PessoaResumo
 
 TipoConsulta = Literal["inicial", "retorno"]
 
@@ -53,3 +54,5 @@ class ConsultaResponse(BaseModel):
     cpf_paciente: Cpf
     cpf_atendente: Cpf
     id_avaliacao_origem: Optional[Id]
+    paciente: PessoaResumo
+    atendente: PessoaResumo

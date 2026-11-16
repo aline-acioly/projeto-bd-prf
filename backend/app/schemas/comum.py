@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import Path, Query
 from pydantic import AfterValidator, BaseModel, ConfigDict, Field
@@ -18,6 +18,9 @@ Id = Annotated[int, Field(ge=1, le=2147483647)]
 IdRota = Annotated[int, Path(ge=1, le=2147483647)]
 CpfRota = Annotated[str, Path(pattern=r"^[0-9]{11}$")]
 DataNascimento = Annotated[date, AfterValidator(_nao_futura)]
+# Filtros opcionais de lista (?cpf_paciente=, ?id_avaliacao=...).
+CpfFiltro = Annotated[Optional[str], Query(pattern=r"^[0-9]{11}$")]
+IdFiltro = Annotated[Optional[int], Query(ge=1, le=2147483647)]
 
 
 class Paginacao:

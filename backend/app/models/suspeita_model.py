@@ -9,6 +9,8 @@ from app.database.database import Base
 if TYPE_CHECKING:
     from app.models.avaliacao_model import Avaliacao
     from app.models.intervencao_model import Intervencao
+    from app.models.medicamento_model import Medicamento
+    from app.models.opcao_nesc_model import OpcaoNesc
 
 
 class Suspeita(Base):
@@ -35,3 +37,10 @@ class Suspeita(Base):
     intervencoes: Mapped[list["Intervencao"]] = relationship(
         back_populates="suspeita", cascade="all, delete-orphan", passive_deletes=True
     )
+    # Só leitura, para a resposta trazer nome do medicamento e dados NESC. No banco,
+    # id_medicamento faz parte da FK composta para USO_MEDICAMENTO, não de uma FK própria.
+    medicamento: Mapped["Medicamento"] = relationship(
+        primaryjoin="foreign(Suspeita.id_medicamento) == Medicamento.id_medicamento",
+        viewonly=True,
+    )
+    opcao_nesc: Mapped["OpcaoNesc"] = relationship(viewonly=True)

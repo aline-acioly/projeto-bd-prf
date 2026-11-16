@@ -8,6 +8,7 @@ from app.database.database import Base
 
 if TYPE_CHECKING:
     from app.models.avaliacao_model import Avaliacao
+    from app.models.pessoa_model import Pessoa
 
 
 class Consulta(Base):
@@ -37,4 +38,12 @@ class Consulta(Base):
         foreign_keys="Avaliacao.id_consulta",
         cascade="all, delete-orphan",
         passive_deletes=True,
+    )
+    # Só leitura, para a resposta trazer os nomes. A FK de cpf_paciente aponta para
+    # PACIENTE, mas o nome está em PESSOA (mesmo CPF), por isso o join explícito.
+    paciente: Mapped["Pessoa"] = relationship(
+        primaryjoin="foreign(Consulta.cpf_paciente) == Pessoa.cpf", viewonly=True
+    )
+    atendente: Mapped["Pessoa"] = relationship(
+        primaryjoin="foreign(Consulta.cpf_atendente) == Pessoa.cpf", viewonly=True
     )

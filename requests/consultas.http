@@ -1,0 +1,126 @@
+# Consultas (atendimento agendado). O status esperado está no título de cada requisição.
+# "Criar" guarda o id gerado (# @name): rode-o antes de "Atualizar" e "Apagar".
+# Rode os "Apagar" no fim para o banco voltar ao seed.
+
+@baseUrl = http://localhost:8000
+
+### Listar, com nome do paciente e do atendente (200)
+GET {{baseUrl}}/consultas
+
+### Listar filtrando por tipo e paciente, com paginação (200)
+GET {{baseUrl}}/consultas?tipo=retorno&cpf_paciente=10000000001&skip=0&limit=10
+
+### Buscar por id (200)
+GET {{baseUrl}}/consultas/1
+
+### Criar consulta inicial (201)
+# @name criar
+POST {{baseUrl}}/consultas
+Content-Type: application/json
+
+{
+  "data_agendada": "2026-12-01",
+  "tipo": "inicial",
+  "cpf_paciente": "10000000004",
+  "cpf_atendente": "30000000002"
+}
+
+### Atualizar (200)
+PATCH {{baseUrl}}/consultas/{{criar.response.body.id_consulta}}
+Content-Type: application/json
+
+{
+  "data_agendada": "2026-12-02",
+  "cpf_atendente": "20000000002"
+}
+
+### Apagar (204)
+DELETE {{baseUrl}}/consultas/{{criar.response.body.id_consulta}}
+
+### Criar consulta de retorno, a partir da avaliação 1 (201)
+# @name criarRetorno
+POST {{baseUrl}}/consultas
+Content-Type: application/json
+
+{
+  "data_agendada": "2026-12-01",
+  "tipo": "retorno",
+  "cpf_paciente": "10000000001",
+  "cpf_atendente": "20000000001",
+  "id_avaliacao_origem": 1
+}
+
+### Apagar o retorno (204)
+DELETE {{baseUrl}}/consultas/{{criarRetorno.response.body.id_consulta}}
+
+### Erro: consulta que não existe (404)
+GET {{baseUrl}}/consultas/999
+
+### Erro: tipo inválido no filtro (422)
+GET {{baseUrl}}/consultas?tipo=urgente
+
+### Erro: retorno sem avaliação de origem, recusado pelo schema (422)
+POST {{baseUrl}}/consultas
+Content-Type: application/json
+
+{
+  "data_agendada": "2026-12-01",
+  "tipo": "retorno",
+  "cpf_paciente": "10000000001",
+  "cpf_atendente": "20000000001"
+}
+
+### Erro: virar retorno sem origem pelo PATCH, recusado pelo CHECK ck_consulta_origem (409)
+PATCH {{baseUrl}}/consultas/4
+Content-Type: application/json
+
+{
+  "tipo": "retorno"
+}
+
+### Erro: paciente inexistente, recusado pela FK (409)
+POST {{baseUrl}}/consultas
+Content-Type: application/json
+
+{
+  "data_agendada": "2026-12-01",
+  "cpf_paciente": "99999999999",
+  "cpf_atendente": "20000000001"
+}
+
+### Erro: atendente é paciente, não profissional nem estagiário — trigger R2 (400)
+POST {{baseUrl}}/consultas
+Content-Type: application/json
+
+{
+  "data_agendada": "2026-12-01",
+  "cpf_paciente": "10000000001",
+  "cpf_atendente": "10000000002"
+}
+
+### Erro: retorno de outro paciente que o da avaliação de origem — trigger R2 (400)
+POST {{baseUrl}}/consultas
+Content-Type: application/json
+
+{
+  "data_agendada": "2026-12-01",
+  "tipo": "retorno",
+  "cpf_paciente": "10000000002",
+  "cpf_atendente": "20000000001",
+  "id_avaliacao_origem": 1
+}
+
+### Erro: retorno agendado antes da avaliação de origem — trigger R2 (400)
+POST {{baseUrl}}/consultas
+Content-Type: application/json
+
+{
+  "data_agendada": "2026-08-01",
+  "tipo": "retorno",
+  "cpf_paciente": "10000000001",
+  "cpf_atendente": "20000000001",
+  "id_avaliacao_origem": 1
+}
+
+### Erro: apagar consulta cuja avaliação originou um retorno (409)
+DELETE {{baseUrl}}/consultas/1

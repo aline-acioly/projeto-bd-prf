@@ -1,0 +1,60 @@
+# Intervenções sobre uma suspeita. O status esperado está no título de cada requisição.
+# "Criar" guarda o id gerado (# @name): rode-o antes de "Atualizar" e "Apagar".
+# Rode "Apagar" no fim para o banco voltar ao seed.
+
+@baseUrl = http://localhost:8000
+
+### Listar (200)
+GET {{baseUrl}}/intervencoes
+
+### Listar as intervenções de uma suspeita, com paginação (200)
+GET {{baseUrl}}/intervencoes?id_suspeita=1&skip=0&limit=10
+
+### Buscar por id (200)
+GET {{baseUrl}}/intervencoes/1
+
+### Criar (201)
+# @name criar
+POST {{baseUrl}}/intervencoes
+Content-Type: application/json
+
+{
+  "tipo": "orientação sobre medicamento",
+  "descricao": "Tomar a metformina junto com as refeições",
+  "id_suspeita": 1
+}
+
+### Atualizar (200)
+PATCH {{baseUrl}}/intervencoes/{{criar.response.body.id_intervencao}}
+Content-Type: application/json
+
+{
+  "tipo": "medidas não farmacológicas",
+  "descricao": "Caminhada de 30 minutos após o almoço"
+}
+
+### Apagar (204)
+DELETE {{baseUrl}}/intervencoes/{{criar.response.body.id_intervencao}}
+
+### Erro: intervenção que não existe (404)
+GET {{baseUrl}}/intervencoes/999
+
+### Erro: tipo fora da lista, recusado pelo schema (422)
+POST {{baseUrl}}/intervencoes
+Content-Type: application/json
+
+{
+  "tipo": "cirurgia",
+  "descricao": "Fora da lista de tipos",
+  "id_suspeita": 1
+}
+
+### Erro: suspeita inexistente, recusada pela FK (409)
+POST {{baseUrl}}/intervencoes
+Content-Type: application/json
+
+{
+  "tipo": "encaminhamento",
+  "descricao": "Suspeita inexistente",
+  "id_suspeita": 999
+}
