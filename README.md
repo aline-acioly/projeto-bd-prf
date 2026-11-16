@@ -23,7 +23,7 @@ projeto-bd-prf/
 │   ├── 01_schema.sql         # tabelas, domínio TIPO_CPF e constraints
 │   ├── 02_triggers.sql       # regras R1 a R4
 │   └── 03_seed.sql           # dados de exemplo
-├── backend/
+├── backend/                  # detalhes em backend/README.md
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   ├── .env.example          # DATABASE_URL para rodar fora do Docker
@@ -122,6 +122,8 @@ uvicorn app.main:app --reload
 ```
 
 O `.env` aponta para `localhost:15432`, e o serviço `backend` do compose usa o host `postgres` na porta `5432`.
+
+A estrutura e as camadas do backend estão em [`backend/README.md`](backend/README.md).
 
 ## Como rodar o frontend local
 

@@ -14,20 +14,24 @@ frontend/
 └── src/
     ├── main.tsx, App.tsx # entrada e rotas
     ├── components/
-    │   ├── atoms/        # Button, Input, Select, Label
-    │   ├── molecules/    # FormField (label + campo + erro), Modal, SqlBlock (SQL recolhível)
+    │   ├── atoms/        # Badge, Button, Input, Label, Select, Tooltip
+    │   │                 # badgesDoDominio: tipo e situação da consulta, papel, categoria NESC
+    │   ├── molecules/    # FormField (label + campo + erro), Modal, PageHeader,
+    │   │                 # SqlBlock (SQL recolhível), StatCard (card de indicador)
     │   ├── organisms/    # DataTable, ResourceForm, ConfirmDialog, ToastProvider,
     │   │                 # CrudSection (tabela + formulário + exclusão), RelatorioSection, Sidebar
-    │   └── templates/    # MainLayout (menu lateral + conteúdo)
-    ├── pages/            # uma página por recurso, PacienteDetalhePage e RelatoriosPage
+    │   └── templates/    # MainLayout (menu lateral + conteúdo centralizado)
+    ├── pages/            # InicioPage, uma página por recurso, PacienteDetalhePage e RelatoriosPage
     ├── services/         # cliente HTTP (fetch) e uma função por rota da API
     ├── hooks/            # useToast, useListaPaginada
     ├── types/            # tipos que espelham os schemas de resposta do backend
-    └── utils/            # formatação (data, CPF) e opções dos selects carregadas da API
+    └── utils/            # formatação (data, CPF, telefone, sexo), rótulos dos domínios do banco,
+                          # situação da consulta e opções dos selects carregadas da API
 ```
 
 ### Como as peças se encaixam
 
+- **Estilo:** as cores existem só como tokens em `tailwind.config.ts`: `primary` (verde-petróleo, em escala), `accent` (âmbar) e os neutros `stone`. Nenhum componente usa cor em hex. As fontes são IBM Plex Sans (texto) e IBM Plex Mono (CPF, ids, números e SQL), carregadas no `index.html`.
 - **Atoms e molecules** são visuais e não conhecem a API.
 - **Organisms genéricos** recebem tudo por props. O `ResourceForm` recebe a lista de campos (`text`, `date`, `number` ou `select`) e suporta:
   - selects carregados da API, inclusive os que dependem de outro campo;
