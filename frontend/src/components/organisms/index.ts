@@ -1,7 +1,7 @@
 export { ConfirmDialog } from "./ConfirmDialog";
 export { CrudSection } from "./CrudSection";
 export { DataTable } from "./DataTable";
-export type { AcaoTabela, ColunaTabela } from "./DataTable";
+export type { ColunaTabela } from "./DataTable";
 export { RelatorioSection } from "./RelatorioSection";
 export { ResourceForm } from "./ResourceForm";
 export type {

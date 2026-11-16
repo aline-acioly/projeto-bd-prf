@@ -39,7 +39,7 @@ export function ConfirmDialog({
 
   return (
     <Modal aberto={aberto} titulo={titulo} onFechar={processando ? () => {} : onCancelar}>
-      <p className="mb-6 text-sm text-gray-700">{mensagem}</p>
+      <p className="mb-6 text-sm text-stone-700">{mensagem}</p>
       <div className="flex justify-end gap-2">
         <Button variante="secundario" onClick={onCancelar} disabled={processando}>
           Cancelar

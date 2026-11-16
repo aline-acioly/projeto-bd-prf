@@ -87,7 +87,15 @@ export interface OpcaoNesc {
 export const TIPOS_CONSULTA = ["inicial", "retorno"] as const;
 export type TipoConsulta = (typeof TIPOS_CONSULTA)[number];
 
-export interface Consulta {
+/** Subclasse de PESSOA do atendente (trigger R2: profissional ou estagiário). */
+export type PapelAtendente = "profissional" | "estagiario";
+
+export interface AtendenteResumo extends PessoaResumo {
+  papel: PapelAtendente | null;
+}
+
+/** Consulta como aparece dentro de uma avaliação (sem a avaliação de volta). */
+export interface ConsultaBase {
   id_consulta: number;
   data_agendada: string;
   tipo: TipoConsulta;
@@ -95,7 +103,12 @@ export interface Consulta {
   cpf_atendente: string;
   id_avaliacao_origem: number | null;
   paciente: PessoaResumo;
-  atendente: PessoaResumo;
+  atendente: AtendenteResumo;
+}
+
+export interface Consulta extends ConsultaBase {
+  /** null: ainda não realizada (agendada). */
+  avaliacao: { id_avaliacao: number; data_realizacao: string } | null;
 }
 
 export interface Avaliacao {
@@ -103,7 +116,8 @@ export interface Avaliacao {
   id_consulta: number;
   data_realizacao: string;
   cpf_supervisor: string | null;
-  consulta: Consulta;
+  consulta: ConsultaBase;
+  supervisor: PessoaResumo | null;
 }
 
 // Suspeitas e intervenções ------------------------------------------------
@@ -145,8 +159,8 @@ export type ProfissionalSaudeEntrada = ProfissionalSaude;
 export type EstagiarioEntrada = Estagiario;
 export type ContatoEmergenciaEntrada = Omit<ContatoEmergencia, "cpf_paciente">;
 export type UsoMedicamentoEntrada = Omit<UsoMedicamento, "cpf_paciente" | "medicamento">;
-export type ConsultaEntrada = Omit<Consulta, "id_consulta" | "paciente" | "atendente">;
-export type AvaliacaoEntrada = Omit<Avaliacao, "id_avaliacao" | "consulta">;
+export type ConsultaEntrada = Omit<ConsultaBase, "id_consulta" | "paciente" | "atendente">;
+export type AvaliacaoEntrada = Omit<Avaliacao, "id_avaliacao" | "consulta" | "supervisor">;
 export type SuspeitaEntrada = Omit<Suspeita, "id_suspeita" | "medicamento" | "opcao_nesc">;
 export type IntervencaoEntrada = Omit<Intervencao, "id_intervencao">;
 
@@ -216,4 +230,20 @@ export interface PacientePolifarmaciaLinha {
 export interface IntervencoesPorTipoLinha {
   tipo: TipoIntervencao;
   total: number;
+}
+
+export interface ResumoLinha {
+  pacientes: number;
+  consultas_sem_avaliacao: number;
+  retornos_pendentes: number;
+  suspeitas: number;
+}
+
+export interface ProximoAtendimentoLinha {
+  id_consulta: number;
+  data_agendada: string;
+  tipo: TipoConsulta;
+  paciente: string;
+  atendente: string;
+  papel_atendente: PapelAtendente;
 }

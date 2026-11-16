@@ -1,3 +1,4 @@
+import { BadgeCategoriaNesc } from "@/components/atoms";
 import { CrudSection, type CampoFormulario, type ColunaTabela } from "@/components/organisms";
 import { MainLayout } from "@/components/templates";
 import { opcoesNescApi } from "@/services";
@@ -11,8 +12,8 @@ const CAMPOS: CampoFormulario[] = [
 ];
 
 const COLUNAS: ColunaTabela<OpcaoNesc>[] = [
-  { titulo: "ID", valor: (o) => o.id_opcao_nesc },
-  { titulo: "Categoria", valor: (o) => o.categoria },
+  { titulo: "ID", valor: (o) => o.id_opcao_nesc, mono: true },
+  { titulo: "Categoria", valor: (o) => <BadgeCategoriaNesc categoria={o.categoria} /> },
   { titulo: "Subtipo", valor: (o) => o.subtipo },
   { titulo: "Descrição", valor: (o) => o.descricao },
 ];
@@ -22,6 +23,7 @@ export function OpcoesNescPage() {
     <MainLayout>
       <CrudSection
         titulo="Opções NESC"
+        descricao="Problemas relacionados a medicamentos, classificados por Necessidade, Efetividade, Segurança e Cumprimento."
         nomeSingular="opção NESC"
         feminino
         colunas={COLUNAS}

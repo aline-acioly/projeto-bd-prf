@@ -36,6 +36,8 @@ export interface CampoFormulario {
   min?: number;
   /** No select, é o texto da opção vazia. */
   placeholder?: string;
+  /** Regra do campo, explicada num tooltip ao lado do rótulo. */
+  ajuda?: string;
 }
 
 interface ResourceFormProps {
@@ -216,6 +218,7 @@ export function ResourceForm({
             rotulo={campo.rotulo}
             obrigatorio={campo.obrigatorio}
             erro={erros[campo.nome]}
+            ajuda={campo.ajuda}
           >
             {campo.tipo === "select" ? (
               <SelectDoCampo

@@ -11,8 +11,8 @@ const CAMPOS: CampoFormulario[] = [
 ];
 
 const COLUNAS: ColunaTabela<Intervencao>[] = [
-  { titulo: "ID", valor: (i) => i.id_intervencao },
-  { titulo: "Suspeita", valor: (i) => `#${i.id_suspeita}` },
+  { titulo: "ID", valor: (i) => i.id_intervencao, mono: true },
+  { titulo: "Suspeita", valor: (i) => `#${i.id_suspeita}`, mono: true },
   { titulo: "Tipo", valor: (i) => i.tipo },
   { titulo: "Descrição", valor: (i) => i.descricao },
 ];
@@ -22,6 +22,7 @@ export function IntervencoesPage() {
     <MainLayout>
       <CrudSection
         titulo="Intervenções"
+        descricao="Ações tomadas sobre cada suspeita: encaminhamento, prescrição, orientação ou medidas não farmacológicas."
         nomeSingular="intervenção"
         feminino
         colunas={COLUNAS}

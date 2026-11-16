@@ -21,6 +21,7 @@ export function EstagiariosPage() {
     <MainLayout>
       <CrudSection
         titulo="Estagiários"
+        descricao="Estagiários: atendem consultas, e a avaliação deles exige um profissional como supervisor (R3)."
         nomeSingular="estagiário"
         colunas={COLUNAS}
         chaveLinha={(e) => e.cpf}

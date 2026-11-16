@@ -1,2 +1,2 @@
-export { capitalizar, formatarCpf, formatarData } from "./formatar";
+export { capitalizar, formatarCpf, formatarData, formatarSexo, formatarTelefone } from "./formatar";
 export * from "./opcoes";

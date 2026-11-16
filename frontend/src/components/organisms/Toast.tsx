@@ -12,8 +12,8 @@ interface ItemToast {
 const DURACAO_MS: Record<TipoToast, number> = { sucesso: 4000, erro: 8000 };
 
 const CLASSES: Record<TipoToast, string> = {
-  sucesso: "border-green-300 bg-green-50 text-green-800",
-  erro: "border-red-300 bg-red-50 text-red-800",
+  sucesso: "border-primary-100 bg-primary-50 text-primary-900",
+  erro: "border-red-200 bg-red-50 text-red-800",
 };
 
 /** Guarda os avisos e os mostra no canto da tela. Use com o hook useToast(). */
@@ -51,7 +51,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={id}
             role={tipo === "erro" ? "alert" : "status"}
-            className={`flex items-start gap-3 rounded-md border p-3 text-sm shadow-md ${CLASSES[tipo]}`}
+            className={`flex items-start gap-3 rounded-md border p-3 text-sm shadow-sm ${CLASSES[tipo]}`}
           >
             <span className="flex-1">{mensagem}</span>
             <button

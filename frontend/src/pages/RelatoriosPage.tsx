@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { Select, type OpcaoSelect } from "@/components/atoms";
+import { BadgeCategoriaNesc, BadgeTipoConsulta, Select, type OpcaoSelect } from "@/components/atoms";
+import { PageHeader } from "@/components/molecules";
 import { RelatorioSection, type ColunaTabela } from "@/components/organisms";
 import { MainLayout } from "@/components/templates";
 import { useToast } from "@/hooks";
@@ -14,42 +15,43 @@ import type {
   RetornoPendenteLinha,
   SuspeitasPorCategoriaLinha,
 } from "@/types";
-import { formatarCpf, formatarData, opcoesPacientes } from "@/utils";
+import { formatarCpf, formatarData, formatarTelefone, opcoesPacientes } from "@/utils";
 
 const ou = (valor: string | number | null) => (valor === null ? "—" : valor);
 
 const COLUNAS_HISTORICO: ColunaTabela<HistoricoPacienteLinha>[] = [
-  { titulo: "Consulta", valor: (l) => `#${l.id_consulta} · ${formatarData(l.data_agendada)}` },
-  { titulo: "Tipo", valor: (l) => l.tipo },
+  { titulo: "Consulta", valor: (l) => `#${l.id_consulta}`, mono: true },
+  { titulo: "Data", valor: (l) => formatarData(l.data_agendada) },
+  { titulo: "Tipo", valor: (l) => <BadgeTipoConsulta tipo={l.tipo} /> },
   { titulo: "Atendente", valor: (l) => l.atendente },
   { titulo: "Avaliação", valor: (l) => (l.id_avaliacao === null ? "ainda não avaliada" : `#${l.id_avaliacao} · ${formatarData(l.data_realizacao)}`) },
   { titulo: "Medicamento suspeito", valor: (l) => ou(l.medicamento) },
-  { titulo: "Categoria NESC", valor: (l) => ou(l.categoria_nesc) },
+  { titulo: "Categoria NESC", valor: (l) => (l.categoria_nesc ? <BadgeCategoriaNesc categoria={l.categoria_nesc} /> : "—") },
   { titulo: "Problema", valor: (l) => ou(l.problema) },
 ];
 
 const COLUNAS_CATEGORIA: ColunaTabela<SuspeitasPorCategoriaLinha>[] = [
-  { titulo: "Categoria NESC", valor: (l) => l.categoria },
-  { titulo: "Suspeitas", valor: (l) => l.total },
+  { titulo: "Categoria NESC", valor: (l) => <BadgeCategoriaNesc categoria={l.categoria} /> },
+  { titulo: "Suspeitas", valor: (l) => l.total, mono: true },
 ];
 
 const COLUNAS_SEM_AVALIACAO: ColunaTabela<PacienteSemAvaliacaoLinha>[] = [
   { titulo: "Paciente", valor: (l) => l.nome },
-  { titulo: "CPF", valor: (l) => formatarCpf(l.cpf) },
-  { titulo: "Telefone", valor: (l) => l.telefone },
-  { titulo: "Consultas agendadas", valor: (l) => l.total_consultas },
+  { titulo: "CPF", valor: (l) => formatarCpf(l.cpf), mono: true },
+  { titulo: "Telefone", valor: (l) => formatarTelefone(l.telefone), mono: true },
+  { titulo: "Consultas agendadas", valor: (l) => l.total_consultas, mono: true },
 ];
 
 const COLUNAS_RETORNOS: ColunaTabela<RetornoPendenteLinha>[] = [
-  { titulo: "Consulta", valor: (l) => `#${l.id_consulta}` },
+  { titulo: "Consulta", valor: (l) => `#${l.id_consulta}`, mono: true },
   { titulo: "Data agendada", valor: (l) => formatarData(l.data_agendada) },
   { titulo: "Paciente", valor: (l) => l.paciente },
   { titulo: "Atendente", valor: (l) => l.atendente },
-  { titulo: "Avaliação de origem", valor: (l) => `#${l.id_avaliacao_origem}` },
+  { titulo: "Avaliação de origem", valor: (l) => `#${l.id_avaliacao_origem}`, mono: true },
 ];
 
 const COLUNAS_ESTAGIARIOS: ColunaTabela<AvaliacaoEstagiarioLinha>[] = [
-  { titulo: "Avaliação", valor: (l) => `#${l.id_avaliacao}` },
+  { titulo: "Avaliação", valor: (l) => `#${l.id_avaliacao}`, mono: true },
   { titulo: "Data", valor: (l) => formatarData(l.data_realizacao) },
   { titulo: "Paciente", valor: (l) => l.paciente },
   { titulo: "Estagiário", valor: (l) => l.estagiario },
@@ -58,19 +60,19 @@ const COLUNAS_ESTAGIARIOS: ColunaTabela<AvaliacaoEstagiarioLinha>[] = [
 
 const COLUNAS_MAIS_SUSPEITAS: ColunaTabela<MedicamentoMaisSuspeitasLinha>[] = [
   { titulo: "Medicamento", valor: (l) => `${l.nome} (${l.forma_farmaceutica})` },
-  { titulo: "Suspeitas", valor: (l) => l.total_suspeitas },
+  { titulo: "Suspeitas", valor: (l) => l.total_suspeitas, mono: true },
 ];
 
 const COLUNAS_POLIFARMACIA: ColunaTabela<PacientePolifarmaciaLinha>[] = [
   { titulo: "Paciente", valor: (l) => l.nome },
-  { titulo: "CPF", valor: (l) => formatarCpf(l.cpf) },
-  { titulo: "Medicamentos em uso", valor: (l) => l.total_medicamentos },
+  { titulo: "CPF", valor: (l) => formatarCpf(l.cpf), mono: true },
+  { titulo: "Medicamentos em uso", valor: (l) => l.total_medicamentos, mono: true },
   { titulo: "Quais", valor: (l) => l.medicamentos },
 ];
 
 const COLUNAS_INTERVENCOES: ColunaTabela<IntervencoesPorTipoLinha>[] = [
   { titulo: "Tipo", valor: (l) => l.tipo },
-  { titulo: "Intervenções", valor: (l) => l.total },
+  { titulo: "Intervenções", valor: (l) => l.total, mono: true },
 ];
 
 export function RelatoriosPage() {
@@ -92,10 +94,10 @@ export function RelatoriosPage() {
 
   return (
     <MainLayout>
-      <h1 className="mb-1 text-2xl font-bold">Relatórios</h1>
-      <p className="mb-8 text-sm text-gray-600">
-        Consultas escritas em SQL puro no backend. Abra "Ver SQL" embaixo de cada tabela para ver o comando executado.
-      </p>
+      <PageHeader
+        titulo="Relatórios"
+        descricao={'Consultas escritas em SQL puro no backend. Abra "Ver SQL" embaixo de cada tabela para ver o comando executado.'}
+      />
 
       <RelatorioSection
         titulo="Histórico do paciente"
@@ -106,14 +108,15 @@ export function RelatoriosPage() {
         aguardando="Escolha um paciente."
         mensagemVazia="Este paciente ainda não tem consultas."
         filtros={
-          <Select
-            aria-label="Paciente do histórico"
-            className="w-80"
-            opcoes={pacientes}
-            placeholder="Escolha um paciente"
-            value={cpf}
-            onChange={(evento) => setCpf(evento.target.value)}
-          />
+          <div className="w-80">
+            <Select
+              aria-label="Paciente do histórico"
+              opcoes={pacientes}
+              placeholder="Escolha um paciente"
+              value={cpf}
+              onChange={(evento) => setCpf(evento.target.value)}
+            />
+          </div>
         }
       />
       <RelatorioSection

@@ -42,5 +42,5 @@ export function useListaPaginada<T>(
 
   const recarregar = useCallback(() => setVersao((v) => v + 1), []);
 
-  return { linhas, pagina, setPagina, temProxima, carregando, recarregar };
+  return { linhas, pagina, setPagina, temProxima, carregando, recarregar, tamanhoPagina };
 }

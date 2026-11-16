@@ -16,7 +16,7 @@ const CAMPOS: CampoFormulario[] = [
 ];
 
 const COLUNAS: ColunaTabela<Medicamento>[] = [
-  { titulo: "ID", valor: (m) => m.id_medicamento },
+  { titulo: "ID", valor: (m) => m.id_medicamento, mono: true },
   { titulo: "Nome", valor: (m) => m.nome },
   { titulo: "Forma farmacêutica", valor: (m) => m.forma_farmaceutica },
 ];
@@ -26,6 +26,7 @@ export function MedicamentosPage() {
     <MainLayout>
       <CrudSection
         titulo="Medicamentos"
+        descricao="Catálogo de medicamentos. A dose, a via e a frequência ficam no uso de cada paciente."
         nomeSingular="medicamento"
         colunas={COLUNAS}
         chaveLinha={(m) => m.id_medicamento}

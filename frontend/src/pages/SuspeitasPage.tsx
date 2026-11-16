@@ -1,3 +1,4 @@
+import { BadgeCategoriaNesc } from "@/components/atoms";
 import { CrudSection, type CampoFormulario, type ColunaTabela, type TextosFormulario, type ValoresFormulario } from "@/components/organisms";
 import { MainLayout } from "@/components/templates";
 import { avaliacoesApi, suspeitasApi } from "@/services";
@@ -27,6 +28,7 @@ const CAMPOS: CampoFormulario[] = [
     nome: "id_medicamento",
     rotulo: "Medicamento em uso",
     tipo: "select",
+    ajuda: "Só os medicamentos que o paciente da avaliação usa — regra R4.",
     obrigatorio: true,
     numerico: true,
     dependeDe: ["id_avaliacao"],
@@ -37,12 +39,22 @@ const CAMPOS: CampoFormulario[] = [
 ];
 
 const COLUNAS: ColunaTabela<Suspeita>[] = [
-  { titulo: "ID", valor: (s) => s.id_suspeita },
+  { titulo: "ID", valor: (s) => s.id_suspeita, mono: true },
   { titulo: "Registro", valor: (s) => formatarData(s.data_registro) },
-  { titulo: "Avaliação", valor: (s) => `#${s.id_avaliacao}` },
-  { titulo: "Paciente (CPF)", valor: (s) => formatarCpf(s.cpf_paciente) },
+  { titulo: "Avaliação", valor: (s) => `#${s.id_avaliacao}`, mono: true },
+  { titulo: "Paciente (CPF)", valor: (s) => formatarCpf(s.cpf_paciente), mono: true },
   { titulo: "Medicamento", valor: (s) => `${s.medicamento.nome} (${s.medicamento.forma_farmaceutica})` },
-  { titulo: "NESC", valor: (s) => `${s.opcao_nesc.categoria} / ${s.opcao_nesc.subtipo}: ${s.opcao_nesc.descricao}` },
+  {
+    titulo: "Problema (NESC)",
+    valor: (s) => (
+      <span className="inline-flex flex-wrap items-center gap-2">
+        <BadgeCategoriaNesc categoria={s.opcao_nesc.categoria} />
+        <span>
+          {s.opcao_nesc.subtipo}: {s.opcao_nesc.descricao}
+        </span>
+      </span>
+    ),
+  },
 ];
 
 async function criar(v: ValoresFormulario) {
@@ -62,6 +74,7 @@ export function SuspeitasPage() {
     <MainLayout>
       <CrudSection
         titulo="Suspeitas"
+        descricao="Suspeitas de problema com um medicamento que o paciente usa, registradas numa avaliação."
         nomeSingular="suspeita"
         feminino
         colunas={COLUNAS}

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { PageHeader } from "@/components/molecules";
 import { CrudSection, type CampoFormulario, type ColunaTabela } from "@/components/organisms";
 import { MainLayout } from "@/components/templates";
 import { useToast } from "@/hooks";
@@ -12,7 +13,7 @@ import type {
   UsoMedicamento,
   UsoMedicamentoEntrada,
 } from "@/types";
-import { formatarCpf, formatarData, opcoesMedicamentos } from "@/utils";
+import { formatarCpf, formatarData, formatarSexo, formatarTelefone, opcoesMedicamentos } from "@/utils";
 
 const CAMPOS_CONTATO: CampoFormulario[] = [
   // O nome é parte da chave (entidade fraca): não muda na edição.
@@ -23,7 +24,7 @@ const CAMPOS_CONTATO: CampoFormulario[] = [
 
 const COLUNAS_CONTATO: ColunaTabela<ContatoEmergencia>[] = [
   { titulo: "Nome", valor: (c) => c.nome },
-  { titulo: "Telefone", valor: (c) => c.telefone },
+  { titulo: "Telefone", valor: (c) => formatarTelefone(c.telefone), mono: true },
   { titulo: "Relação", valor: (c) => c.relacao },
 ];
 
@@ -77,27 +78,31 @@ export function PacienteDetalhePage() {
 
   return (
     <MainLayout>
-      <Link to="/pacientes" className="text-sm text-primary underline">
+      <Link to="/pacientes" className="mb-3 inline-block text-sm text-primary-700 underline">
         ← Voltar para pacientes
       </Link>
 
       {erro ? (
-        <p className="py-20 text-center text-gray-500">{erro}</p>
+        <p className="py-20 text-center text-stone-500">{erro}</p>
       ) : !paciente ? (
-        <p className="py-20 text-center text-gray-500">Carregando...</p>
+        <p className="py-20 text-center text-stone-500">Carregando...</p>
       ) : (
         <>
-          <div className="mb-2 mt-4">
-            <h1 className="text-2xl font-bold">{paciente.nome}</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              CPF {formatarCpf(paciente.cpf)} · nascimento {formatarData(paciente.data_nasc)} · sexo {paciente.sexo} ·
-              telefone {paciente.telefone}
-            </p>
-          </div>
+          <PageHeader
+            titulo={paciente.nome}
+            descricao={
+              <>
+                Ficha do paciente: CPF <span className="font-mono">{formatarCpf(paciente.cpf)}</span> · nascimento{" "}
+                {formatarData(paciente.data_nasc)} · {formatarSexo(paciente.sexo).toLowerCase()} · telefone{" "}
+                <span className="font-mono">{formatarTelefone(paciente.telefone)}</span>
+              </>
+            }
+          />
 
           <CrudSection
             secao
             titulo="Contatos de emergência"
+            descricao="Quem avisar em caso de necessidade."
             nomeSingular="contato"
             colunas={COLUNAS_CONTATO}
             chaveLinha={(c) => c.nome}
@@ -112,6 +117,7 @@ export function PacienteDetalhePage() {
           <CrudSection
             secao
             titulo="Medicamentos em uso"
+            descricao="Dose, via e frequência de cada medicamento; as suspeitas só podem citar estes."
             nomeSingular="medicamento em uso"
             colunas={COLUNAS_USO}
             chaveLinha={(u) => u.id_medicamento}

@@ -1,7 +1,7 @@
 // Campos e colunas de PESSOA, comuns a pacientes, profissionais e estagiários.
 import type { CampoFormulario, ColunaTabela } from "@/components/organisms";
 import type { Pessoa } from "@/types";
-import { formatarCpf, formatarData } from "@/utils";
+import { formatarCpf, formatarData, formatarSexo, formatarTelefone } from "@/utils";
 
 export const CAMPOS_PESSOA: CampoFormulario[] = [
   { nome: "cpf", rotulo: "CPF", tipo: "text", obrigatorio: true, fixoNaEdicao: true, maxLength: 11, placeholder: "Só os 11 números" },
@@ -23,9 +23,9 @@ export const CAMPOS_PESSOA: CampoFormulario[] = [
 export function colunasPessoa<T extends Pessoa>(): ColunaTabela<T>[] {
   return [
     { titulo: "Nome", valor: (p) => p.nome },
-    { titulo: "CPF", valor: (p) => formatarCpf(p.cpf) },
+    { titulo: "CPF", valor: (p) => formatarCpf(p.cpf), mono: true },
     { titulo: "Nascimento", valor: (p) => formatarData(p.data_nasc) },
-    { titulo: "Sexo", valor: (p) => p.sexo },
-    { titulo: "Telefone", valor: (p) => p.telefone },
+    { titulo: "Sexo", valor: (p) => formatarSexo(p.sexo) },
+    { titulo: "Telefone", valor: (p) => formatarTelefone(p.telefone), mono: true },
   ];
 }

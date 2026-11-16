@@ -10,3 +10,4 @@ export { PacientesPage } from "./PacientesPage";
 export { ProfissionaisPage } from "./ProfissionaisPage";
 export { SuspeitasPage } from "./SuspeitasPage";
 export { RelatoriosPage } from "./RelatoriosPage";
+export { InicioPage } from "./InicioPage";

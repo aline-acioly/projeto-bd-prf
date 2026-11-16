@@ -1,15 +1,17 @@
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/atoms";
-import { Modal } from "@/components/molecules";
+import { Modal, PageHeader } from "@/components/molecules";
 import { useListaPaginada, useToast } from "@/hooks";
 import type { ParametrosLista } from "@/types";
 import { capitalizar } from "@/utils";
 import { ConfirmDialog } from "./ConfirmDialog";
-import { DataTable, type AcaoTabela, type ColunaTabela } from "./DataTable";
+import { DataTable, type ColunaTabela } from "./DataTable";
 import { ResourceForm, type CampoFormulario, type ValoresFormulario } from "./ResourceForm";
 
 interface CrudSectionProps<T> {
   titulo: string;
+  /** Uma linha dizendo para que a página/seção serve. */
+  descricao?: string;
   /** Em minúsculas: "medicamento", "opção NESC". Monta os textos de botões e avisos. */
   nomeSingular: string;
   feminino?: boolean;
@@ -27,7 +29,6 @@ interface CrudSectionProps<T> {
   excluir: (linha: T) => Promise<unknown>;
   /** Como a linha aparece na confirmação de exclusão. */
   descrever: (linha: T) => string;
-  acoesExtras?: AcaoTabela<T>[];
   /** Filtros mostrados ao lado do botão "Novo". */
   filtros?: ReactNode;
 }
@@ -37,6 +38,7 @@ type EstadoFormulario<T> = null | { modo: "criar" } | { modo: "editar"; linha: T
 /** Lista paginada + formulário de criar/editar num modal + confirmação de exclusão. */
 export function CrudSection<T>({
   titulo,
+  descricao,
   nomeSingular,
   feminino,
   secao,
@@ -49,7 +51,6 @@ export function CrudSection<T>({
   atualizar,
   excluir,
   descrever,
-  acoesExtras,
   filtros,
 }: CrudSectionProps<T>) {
   const toast = useToast();
@@ -57,8 +58,8 @@ export function CrudSection<T>({
   const [formulario, setFormulario] = useState<EstadoFormulario<T>>(null);
   const [excluindo, setExcluindo] = useState<{ linha: T } | null>(null);
 
-  const Titulo = secao ? "h2" : "h1";
   const novo = `${feminino ? "Nova" : "Novo"} ${nomeSingular}`;
+  const botaoNovo = <Button onClick={() => setFormulario({ modo: "criar" })}>{capitalizar(novo)}</Button>;
   const finalizar = (verbo: string) => `${capitalizar(nomeSingular)} ${verbo}${feminino ? "a" : "o"}.`;
 
   async function salvar(valores: ValoresFormulario, alterados: ValoresFormulario) {
@@ -85,24 +86,34 @@ export function CrudSection<T>({
 
   return (
     <section className={secao ? "mt-8" : undefined}>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <Titulo className={secao ? "text-lg font-semibold" : "text-2xl font-bold"}>{titulo}</Titulo>
-        <div className="flex flex-wrap items-center gap-3">
-          {filtros}
-          <Button onClick={() => setFormulario({ modo: "criar" })}>{capitalizar(novo)}</Button>
+      {secao ? (
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg">{titulo}</h2>
+            {descricao && <p className="text-sm text-stone-600">{descricao}</p>}
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {filtros}
+            {botaoNovo}
+          </div>
         </div>
-      </div>
+      ) : (
+        <PageHeader titulo={titulo} descricao={descricao}>
+          {filtros}
+          {botaoNovo}
+        </PageHeader>
+      )}
 
       <DataTable
         colunas={colunas}
         linhas={lista.linhas}
         chaveLinha={chaveLinha}
         carregando={lista.carregando}
-        acoesExtras={acoesExtras}
         onEditar={(linha) => setFormulario({ modo: "editar", linha })}
         onExcluir={(linha) => setExcluindo({ linha })}
         pagina={lista.pagina}
         temProxima={lista.temProxima}
+        tamanhoPagina={lista.tamanhoPagina}
         onMudarPagina={lista.setPagina}
       />
 

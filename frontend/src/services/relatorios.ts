@@ -5,7 +5,9 @@ import type {
   MedicamentoMaisSuspeitasLinha,
   PacientePolifarmaciaLinha,
   PacienteSemAvaliacaoLinha,
+  ProximoAtendimentoLinha,
   Relatorio,
+  ResumoLinha,
   RetornoPendenteLinha,
   SuspeitasPorCategoriaLinha,
 } from "@/types";
@@ -24,4 +26,6 @@ export const relatoriosApi = {
     requisitar<Relatorio<MedicamentoMaisSuspeitasLinha>>(`${base}/medicamentos-mais-suspeitas`),
   pacientesPolifarmacia: () => requisitar<Relatorio<PacientePolifarmaciaLinha>>(`${base}/pacientes-polifarmacia`),
   intervencoesPorTipo: () => requisitar<Relatorio<IntervencoesPorTipoLinha>>(`${base}/intervencoes-por-tipo`),
+  resumo: () => requisitar<Relatorio<ResumoLinha>>(`${base}/resumo`),
+  proximosAtendimentos: () => requisitar<Relatorio<ProximoAtendimentoLinha>>(`${base}/proximos-atendimentos`),
 };

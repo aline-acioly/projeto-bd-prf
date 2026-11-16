@@ -13,7 +13,7 @@ const CAMPOS: CampoFormulario[] = [
 
 const COLUNAS = [
   ...colunasPessoa<ProfissionalSaude>(),
-  { titulo: "Registro", valor: (p: ProfissionalSaude) => `${p.conselho} ${p.numero_registro}` },
+  { titulo: "Registro", valor: (p: ProfissionalSaude) => `${p.conselho} ${p.numero_registro}`, mono: true },
   { titulo: "Especialidade", valor: (p: ProfissionalSaude) => p.especialidade },
 ];
 
@@ -22,6 +22,7 @@ export function ProfissionaisPage() {
     <MainLayout>
       <CrudSection
         titulo="Profissionais de saúde"
+        descricao="Profissionais de saúde: atendem consultas e supervisionam as avaliações feitas por estagiários."
         nomeSingular="profissional"
         colunas={COLUNAS}
         chaveLinha={(p) => p.cpf}
