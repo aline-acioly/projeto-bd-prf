@@ -149,3 +149,71 @@ export type ConsultaEntrada = Omit<Consulta, "id_consulta" | "paciente" | "atend
 export type AvaliacaoEntrada = Omit<Avaliacao, "id_avaliacao" | "consulta">;
 export type SuspeitaEntrada = Omit<Suspeita, "id_suspeita" | "medicamento" | "opcao_nesc">;
 export type IntervencaoEntrada = Omit<Intervencao, "id_intervencao">;
+
+// Relatórios ---------------------------------------------------------------
+
+/** Resposta de /relatorios/*: o SQL que rodou no banco e as linhas do resultado. */
+export interface Relatorio<Linha> {
+  sql: string;
+  linhas: Linha[];
+}
+
+export interface HistoricoPacienteLinha {
+  id_consulta: number;
+  data_agendada: string;
+  tipo: TipoConsulta;
+  atendente: string;
+  id_avaliacao: number | null;
+  data_realizacao: string | null;
+  id_suspeita: number | null;
+  medicamento: string | null;
+  categoria_nesc: CategoriaNesc | null;
+  problema: string | null;
+}
+
+export interface SuspeitasPorCategoriaLinha {
+  categoria: CategoriaNesc;
+  total: number;
+}
+
+export interface PacienteSemAvaliacaoLinha {
+  cpf: string;
+  nome: string;
+  telefone: string;
+  total_consultas: number;
+}
+
+export interface RetornoPendenteLinha {
+  id_consulta: number;
+  data_agendada: string;
+  paciente: string;
+  atendente: string;
+  id_avaliacao_origem: number;
+}
+
+export interface AvaliacaoEstagiarioLinha {
+  id_avaliacao: number;
+  data_realizacao: string;
+  paciente: string;
+  estagiario: string;
+  supervisor: string;
+}
+
+export interface MedicamentoMaisSuspeitasLinha {
+  id_medicamento: number;
+  nome: string;
+  forma_farmaceutica: string;
+  total_suspeitas: number;
+}
+
+export interface PacientePolifarmaciaLinha {
+  cpf: string;
+  nome: string;
+  total_medicamentos: number;
+  medicamentos: string;
+}
+
+export interface IntervencoesPorTipoLinha {
+  tipo: TipoIntervencao;
+  total: number;
+}

@@ -8,3 +8,4 @@ export { opcoesNescApi } from "./opcoesNesc";
 export { estagiariosApi, pacientesApi, profissionaisApi } from "./pessoas";
 export { suspeitasApi } from "./suspeitas";
 export { usoMedicamentosApi } from "./usoMedicamentos";
+export { relatoriosApi } from "./relatorios";

@@ -20,10 +20,10 @@ interface DataTableProps<T> {
   onEditar?: (linha: T) => void;
   onExcluir?: (linha: T) => void;
   acoesExtras?: AcaoTabela<T>[];
-  /** Página atual, começando em 0. */
-  pagina: number;
-  temProxima: boolean;
-  onMudarPagina: (pagina: number) => void;
+  /** Página atual, começando em 0. Sem onMudarPagina, a tabela não mostra a paginação. */
+  pagina?: number;
+  temProxima?: boolean;
+  onMudarPagina?: (pagina: number) => void;
   mensagemVazia?: string;
 }
 
@@ -35,8 +35,8 @@ export function DataTable<T>({
   onEditar,
   onExcluir,
   acoesExtras = [],
-  pagina,
-  temProxima,
+  pagina = 0,
+  temProxima = false,
   onMudarPagina,
   mensagemVazia = "Nenhum registro encontrado.",
 }: DataTableProps<T>) {
@@ -109,27 +109,29 @@ export function DataTable<T>({
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 text-sm">
-        <span className="text-gray-600">Página {pagina + 1}</span>
-        <div className="flex gap-2">
-          <Button
-            variante="secundario"
-            className="px-3 py-1"
-            disabled={carregando || pagina === 0}
-            onClick={() => onMudarPagina(pagina - 1)}
-          >
-            Anterior
-          </Button>
-          <Button
-            variante="secundario"
-            className="px-3 py-1"
-            disabled={carregando || !temProxima}
-            onClick={() => onMudarPagina(pagina + 1)}
-          >
-            Próxima
-          </Button>
+      {onMudarPagina && (
+        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 text-sm">
+          <span className="text-gray-600">Página {pagina + 1}</span>
+          <div className="flex gap-2">
+            <Button
+              variante="secundario"
+              className="px-3 py-1"
+              disabled={carregando || pagina === 0}
+              onClick={() => onMudarPagina(pagina - 1)}
+            >
+              Anterior
+            </Button>
+            <Button
+              variante="secundario"
+              className="px-3 py-1"
+              disabled={carregando || !temProxima}
+              onClick={() => onMudarPagina(pagina + 1)}
+            >
+              Próxima
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

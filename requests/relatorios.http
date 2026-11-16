@@ -1,0 +1,37 @@
+# Relatórios em SQL puro. Cada resposta traz {"sql": "...", "linhas": [...]}:
+# o SQL que rodou no banco e o resultado. O status esperado está no título.
+
+@baseUrl = http://localhost:8000
+
+### Histórico do paciente: consultas, avaliações e suspeitas — JOIN e LEFT JOIN (200)
+GET {{baseUrl}}/relatorios/historico-paciente/10000000001
+
+### Histórico de paciente com consulta ainda sem avaliação: colunas do LEFT JOIN vêm null (200)
+GET {{baseUrl}}/relatorios/historico-paciente/10000000004
+
+### Suspeitas por categoria NESC — GROUP BY + COUNT (200)
+GET {{baseUrl}}/relatorios/suspeitas-por-categoria
+
+### Pacientes que nunca foram avaliados — NOT EXISTS (200)
+GET {{baseUrl}}/relatorios/pacientes-sem-avaliacao
+
+### Retornos ainda sem avaliação — NOT EXISTS (200)
+GET {{baseUrl}}/relatorios/retornos-pendentes
+
+### Avaliações de estagiários e seus supervisores — PESSOA com aliases (200)
+GET {{baseUrl}}/relatorios/avaliacoes-estagiarios
+
+### Medicamentos com mais suspeitas — HAVING + >= ALL, empates aparecem todos (200)
+GET {{baseUrl}}/relatorios/medicamentos-mais-suspeitas
+
+### Pacientes com mais de um medicamento em uso — GROUP BY + HAVING (200)
+GET {{baseUrl}}/relatorios/pacientes-polifarmacia
+
+### Intervenções por tipo — GROUP BY + ORDER BY (200)
+GET {{baseUrl}}/relatorios/intervencoes-por-tipo
+
+### Erro: histórico de CPF que não é paciente (404)
+GET {{baseUrl}}/relatorios/historico-paciente/20000000001
+
+### Erro: CPF inválido na URL (422)
+GET {{baseUrl}}/relatorios/historico-paciente/123

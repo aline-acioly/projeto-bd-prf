@@ -10,6 +10,7 @@ from app.controllers.consulta_controller import ConsultaRouter
 from app.controllers.avaliacao_controller import AvaliacaoRouter
 from app.controllers.suspeita_controller import SuspeitaRouter
 from app.controllers.intervencao_controller import IntervencaoRouter
+from app.controllers.relatorio_controller import RelatorioRouter
 from app.database.database import get_db
 from app.infra.errors import registrar_handlers
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,6 +42,7 @@ app.include_router(ConsultaRouter)
 app.include_router(AvaliacaoRouter)
 app.include_router(SuspeitaRouter)
 app.include_router(IntervencaoRouter)
+app.include_router(RelatorioRouter)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:8080"],

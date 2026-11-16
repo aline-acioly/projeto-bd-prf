@@ -11,6 +11,7 @@ import {
   PacienteDetalhePage,
   PacientesPage,
   ProfissionaisPage,
+  RelatoriosPage,
   SuspeitasPage,
 } from "./pages";
 
@@ -29,6 +30,7 @@ const App = () => (
         <Route path="/opcoes-nesc" element={<OpcoesNescPage />} />
         <Route path="/suspeitas" element={<SuspeitasPage />} />
         <Route path="/intervencoes" element={<IntervencoesPage />} />
+        <Route path="/relatorios" element={<RelatoriosPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
