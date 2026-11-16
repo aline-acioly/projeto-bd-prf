@@ -33,3 +33,9 @@ class RelatorioService:
 
     def intervencoes_por_tipo(self):
         return self.repository.intervencoes_por_tipo()
+
+    def resumo(self):
+        return self.repository.resumo()
+
+    def proximos_atendimentos(self):
+        return self.repository.proximos_atendimentos()

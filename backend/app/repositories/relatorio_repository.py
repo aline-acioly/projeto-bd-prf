@@ -116,6 +116,36 @@ INTERVENCOES_POR_TIPO = _sql("""
 """)
 
 
+# Contagens da página Início, num único SELECT com subconsultas escalares.
+RESUMO = _sql("""
+    SELECT (SELECT COUNT(*) FROM paciente) AS pacientes,
+           (SELECT COUNT(*)
+              FROM consulta c
+             WHERE NOT EXISTS (SELECT 1 FROM avaliacao a WHERE a.id_consulta = c.id_consulta)
+           ) AS consultas_sem_avaliacao,
+           (SELECT COUNT(*)
+              FROM consulta c
+             WHERE c.tipo = 'retorno'
+               AND NOT EXISTS (SELECT 1 FROM avaliacao a WHERE a.id_consulta = c.id_consulta)
+           ) AS retornos_pendentes,
+           (SELECT COUNT(*) FROM suspeita) AS suspeitas
+""")
+
+# Consultas ainda sem avaliação, por data; o papel do atendente vem de qual subclasse existe.
+PROXIMOS_ATENDIMENTOS = _sql("""
+    SELECT c.id_consulta, c.data_agendada, c.tipo,
+           paciente.nome  AS paciente,
+           atendente.nome AS atendente,
+           CASE WHEN EXISTS (SELECT 1 FROM estagiario e WHERE e.cpf = c.cpf_atendente)
+                THEN 'estagiario' ELSE 'profissional' END AS papel_atendente
+      FROM consulta c
+      JOIN pessoa paciente  ON paciente.cpf = c.cpf_paciente
+      JOIN pessoa atendente ON atendente.cpf = c.cpf_atendente
+     WHERE NOT EXISTS (SELECT 1 FROM avaliacao a WHERE a.id_consulta = c.id_consulta)
+     ORDER BY c.data_agendada, c.id_consulta
+""")
+
+
 class RelatorioRepository:
     def __init__(self, db: Session):
         self.db = db
@@ -150,3 +180,9 @@ class RelatorioRepository:
 
     def intervencoes_por_tipo(self) -> dict:
         return self._executar(INTERVENCOES_POR_TIPO)
+
+    def resumo(self) -> dict:
+        return self._executar(RESUMO)
+
+    def proximos_atendimentos(self) -> dict:
+        return self._executar(PROXIMOS_ATENDIMENTOS)

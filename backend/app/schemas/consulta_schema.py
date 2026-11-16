@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -7,6 +7,35 @@ from app.schemas.comum import Cpf, EntradaBase, Id
 from app.schemas.pessoa_schema import PessoaResumo
 
 TipoConsulta = Literal["inicial", "retorno"]
+PapelAtendente = Literal["profissional", "estagiario"]
+
+
+class AtendenteResumo(PessoaResumo):
+    """CPF, nome e papel do atendente (a união Profissional U Estagiário da trigger R2)."""
+
+    papel: Optional[PapelAtendente]
+
+    @model_validator(mode="before")
+    @classmethod
+    def calcular_papel(cls, dados: Any) -> Any:
+        # Recebe a PESSOA do ORM: o papel é a subclasse que existe para o CPF.
+        if isinstance(dados, dict):
+            return dados
+        papel = (
+            "profissional"
+            if getattr(dados, "profissional_saude", None) is not None
+            else "estagiario" if getattr(dados, "estagiario", None) is not None else None
+        )
+        return {"cpf": dados.cpf, "nome": dados.nome, "papel": papel}
+
+
+class AvaliacaoDaConsulta(BaseModel):
+    """A avaliação 1:1 da consulta, quando já existe (consulta realizada)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id_avaliacao: Id
+    data_realizacao: date
 
 
 def _validar_origem(tipo: str, id_avaliacao_origem: Optional[int]) -> None:
@@ -45,7 +74,9 @@ class ConsultaUpdate(EntradaBase):
         return self
 
 
-class ConsultaResponse(BaseModel):
+class ConsultaBaseResponse(BaseModel):
+    """Consulta sem a avaliação: é a que aparece dentro de AvaliacaoResponse."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id_consulta: Id
@@ -55,4 +86,9 @@ class ConsultaResponse(BaseModel):
     cpf_atendente: Cpf
     id_avaliacao_origem: Optional[Id]
     paciente: PessoaResumo
-    atendente: PessoaResumo
+    atendente: AtendenteResumo
+
+
+class ConsultaResponse(ConsultaBaseResponse):
+    # null: a consulta ainda não foi realizada (agendada).
+    avaliacao: Optional[AvaliacaoDaConsulta]

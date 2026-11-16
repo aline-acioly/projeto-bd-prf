@@ -105,6 +105,7 @@ Mais detalhes, incluindo a organização em Atomic Design, em [`frontend/README.
 
 ## Interface
 
+- **Início:** cards com os números principais e a lista dos próximos atendimentos (consultas ainda sem avaliação).
 - **Menu lateral:** uma página por recurso, cada uma com tabela paginada, formulário de criar/editar num modal e exclusão com confirmação.
 - **Chaves:** são escolhidas em selects carregados da API, nunca digitadas. Isso vale para paciente, atendente, supervisor, medicamento, medicamento em uso, opção NESC, consulta, avaliação e suspeita.
 - **Ficha do paciente:** em Pacientes → Abrir, mostra os contatos de emergência e os medicamentos em uso, cada um com o seu CRUD.
@@ -143,6 +144,8 @@ Ficam em `/relatorios` e só têm `GET`. As consultas são SQL puro, executado c
 | `/relatorios/medicamentos-mais-suspeitas` | medicamento(s) com mais suspeitas, com empates | HAVING + `>= ALL` |
 | `/relatorios/pacientes-polifarmacia` | pacientes com mais de um medicamento em uso | GROUP BY + HAVING |
 | `/relatorios/intervencoes-por-tipo` | intervenções por tipo | GROUP BY + ORDER BY |
+| `/relatorios/resumo` | contagens da página Início (pacientes, consultas sem avaliação, retornos pendentes, suspeitas) | subconsultas escalares + NOT EXISTS |
+| `/relatorios/proximos-atendimentos` | consultas ainda sem avaliação, por data, com o papel do atendente | NOT EXISTS + CASE WHEN EXISTS |
 
 Pacientes, profissionais e estagiários são subclasses de PESSOA. O `POST` grava PESSOA e a subclasse numa única transação, e o `GET` devolve os campos das duas juntos. Nas chaves compostas, o `PATCH` não altera a chave (o CPF de uma pessoa, o nome de um contato, o medicamento de um uso).
 

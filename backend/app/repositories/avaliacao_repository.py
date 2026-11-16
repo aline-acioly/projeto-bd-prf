@@ -5,12 +5,16 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.models.avaliacao_model import Avaliacao
 from app.models.consulta_model import Consulta
+from app.models.pessoa_model import Pessoa
 from app.schemas.avaliacao_schema import AvaliacaoCreate, AvaliacaoUpdate
 
-# A consulta, com os nomes do paciente e do atendente, no mesmo SELECT.
+# No mesmo SELECT: a consulta com os nomes do paciente e do atendente,
+# o papel do atendente e o nome do supervisor.
 CARREGAR_CONSULTA = (
     joinedload(Avaliacao.consulta).joinedload(Consulta.paciente),
-    joinedload(Avaliacao.consulta).joinedload(Consulta.atendente),
+    joinedload(Avaliacao.consulta).joinedload(Consulta.atendente).joinedload(Pessoa.profissional_saude),
+    joinedload(Avaliacao.consulta).joinedload(Consulta.atendente).joinedload(Pessoa.estagiario),
+    joinedload(Avaliacao.supervisor),
 )
 
 

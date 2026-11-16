@@ -11,7 +11,9 @@ from app.schemas.relatorio_schema import (
     MedicamentoMaisSuspeitasLinha,
     PacientePolifarmaciaLinha,
     PacienteSemAvaliacaoLinha,
+    ProximoAtendimentoLinha,
     Relatorio,
+    ResumoLinha,
     RetornoPendenteLinha,
     SuspeitasPorCategoriaLinha,
 )
@@ -94,3 +96,21 @@ def pacientes_polifarmacia(service: RelatorioService = Depends(get_relatorio_ser
 )
 def intervencoes_por_tipo(service: RelatorioService = Depends(get_relatorio_service)):
     return service.intervencoes_por_tipo()
+
+
+@RelatorioRouter.get(
+    "/resumo",
+    response_model=Relatorio[ResumoLinha],
+    summary="Contagens da página Início (um SELECT com subconsultas)",
+)
+def resumo(service: RelatorioService = Depends(get_relatorio_service)):
+    return service.resumo()
+
+
+@RelatorioRouter.get(
+    "/proximos-atendimentos",
+    response_model=Relatorio[ProximoAtendimentoLinha],
+    summary="Consultas ainda sem avaliação, por data (NOT EXISTS)",
+)
+def proximos_atendimentos(service: RelatorioService = Depends(get_relatorio_service)):
+    return service.proximos_atendimentos()

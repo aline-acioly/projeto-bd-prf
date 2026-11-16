@@ -30,6 +30,12 @@ GET {{baseUrl}}/relatorios/pacientes-polifarmacia
 ### Intervenções por tipo — GROUP BY + ORDER BY (200)
 GET {{baseUrl}}/relatorios/intervencoes-por-tipo
 
+### Resumo da página Início: contagens num único SELECT com subconsultas (200)
+GET {{baseUrl}}/relatorios/resumo
+
+### Próximos atendimentos: consultas ainda sem avaliação, por data — NOT EXISTS (200)
+GET {{baseUrl}}/relatorios/proximos-atendimentos
+
 ### Erro: histórico de CPF que não é paciente (404)
 GET {{baseUrl}}/relatorios/historico-paciente/20000000001
 

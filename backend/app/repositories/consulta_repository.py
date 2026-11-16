@@ -4,10 +4,17 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.consulta_model import Consulta
+from app.models.pessoa_model import Pessoa
 from app.schemas.consulta_schema import ConsultaCreate, ConsultaUpdate
 
-# Nomes do paciente e do atendente no mesmo SELECT.
-CARREGAR_PESSOAS = (joinedload(Consulta.paciente), joinedload(Consulta.atendente))
+# No mesmo SELECT: nomes do paciente e do atendente, o papel do atendente
+# (subclasse que existe para o CPF) e a avaliação, se a consulta já foi realizada.
+CARREGAR_PESSOAS = (
+    joinedload(Consulta.paciente),
+    joinedload(Consulta.atendente).joinedload(Pessoa.profissional_saude),
+    joinedload(Consulta.atendente).joinedload(Pessoa.estagiario),
+    joinedload(Consulta.avaliacao),
+)
 
 
 class ConsultaRepository:

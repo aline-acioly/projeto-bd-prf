@@ -8,6 +8,7 @@ from app.database.database import Base
 
 if TYPE_CHECKING:
     from app.models.consulta_model import Consulta
+    from app.models.pessoa_model import Pessoa
     from app.models.suspeita_model import Suspeita
 
 
@@ -29,4 +30,9 @@ class Avaliacao(Base):
     )
     suspeitas: Mapped[list["Suspeita"]] = relationship(
         back_populates="avaliacao", cascade="all, delete-orphan", passive_deletes=True
+    )
+    # Só leitura, para a resposta trazer o nome do supervisor. A FK aponta para
+    # PROFISSIONAL_SAUDE, mas o nome está em PESSOA (mesmo CPF).
+    supervisor: Mapped[Optional["Pessoa"]] = relationship(
+        primaryjoin="foreign(Avaliacao.cpf_supervisor) == Pessoa.cpf", viewonly=True
     )

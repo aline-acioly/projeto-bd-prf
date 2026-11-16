@@ -74,3 +74,19 @@ class PacientePolifarmaciaLinha(BaseModel):
 class IntervencoesPorTipoLinha(BaseModel):
     tipo: str
     total: int
+
+
+class ResumoLinha(BaseModel):
+    pacientes: int
+    consultas_sem_avaliacao: int
+    retornos_pendentes: int
+    suspeitas: int
+
+
+class ProximoAtendimentoLinha(BaseModel):
+    id_consulta: int
+    data_agendada: date
+    tipo: str
+    paciente: str
+    atendente: str
+    papel_atendente: str
